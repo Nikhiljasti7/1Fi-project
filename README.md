@@ -2,7 +2,9 @@
 
 A modern full-stack web application for purchasing flagship smartphones on 0% and low-cost EMI plans backed by Mutual Funds and Demat Stocks (Loan Against Mutual Funds - LAMF) — built for the **1Fi SDE1 assignment**.
 
-**GitHub Repository:** [https://github.com/Nikhiljasti7/1Fi-project](https://github.com/Nikhiljasti7/1Fi-project)
+**GitHub Repository:** [https://github.com/Nikhiljasti7/1Fi-project](https://github.com/Nikhiljasti7/1Fi-project)  
+**Live Frontend Website:** [https://1-fi-project-frontend.vercel.app](https://1-fi-project-frontend.vercel.app)  
+**Live Backend API:** [https://1-fi-project-backend.vercel.app/api/health](https://1-fi-project-backend.vercel.app/api/health)  
 
 ---
 
