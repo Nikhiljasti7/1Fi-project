@@ -1,49 +1,50 @@
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Lock, Award, CheckCircle2 } from 'lucide-react';
+import Logo from './Logo';
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-dark-950 text-slate-400 mt-20">
+    <footer className="border-t border-slate-200 bg-white text-slate-500 mt-20">
       {/* Trust & Regulatory Highlights */}
-      <div className="border-b border-white/5 bg-white/[0.02] py-8">
+      <div className="border-b border-slate-200 bg-slate-50/80 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-600">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-white">SEBI Registered Depositories</h4>
+                <h4 className="text-xs font-bold text-slate-900">SEBI Registered Depositories</h4>
                 <p className="text-[11px] text-slate-500">Pledging via CAMS, KFintech &amp; CDSL</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600">
                 <Lock className="h-5 w-5" />
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-white">Your Portfolio Stays Yours</h4>
+                <h4 className="text-xs font-bold text-slate-900">Your Portfolio Stays Yours</h4>
                 <p className="text-[11px] text-slate-500">Units remain invested &amp; earn 12-18% CAGR</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-50 border border-cyan-200 text-cyan-600">
                 <Award className="h-5 w-5" />
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-white">100% Subsidized 0% EMI</h4>
+                <h4 className="text-xs font-bold text-slate-900">100% Subsidized 0% EMI</h4>
                 <p className="text-[11px] text-slate-500">Up to ₹11,000 instant cashback</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 border border-amber-200 text-amber-600">
                 <CheckCircle2 className="h-5 w-5" />
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-white">Instant Lien Release</h4>
+                <h4 className="text-xs font-bold text-slate-900">Instant Lien Release</h4>
                 <p className="text-[11px] text-slate-500">Automatic unpledge on final EMI debit</p>
               </div>
             </div>
@@ -54,107 +55,57 @@ export default function Footer() {
       {/* Main Footer Links */}
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-2">
-              <span className="font-display font-bold text-xl text-white">
-                1Fi <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-emerald-400">Wealth-Backed EMI</span>
+          <div className="md:col-span-2 space-y-4">
+            <div className="flex items-center gap-3">
+              <Logo className="h-9 w-9" />
+              <span className="font-display font-bold text-xl text-slate-900">
+                1Fi <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-emerald-600">Wealth-Backed EMI</span>
               </span>
             </div>
-            <p className="mt-3 text-xs leading-relaxed text-slate-400 max-w-md">
-              A modern consumer financing platform enabling smartphone shoppers to leverage their mutual funds and demat stocks as collateral (Loan Against Mutual Funds - LAMF), unlocking 0% and low-cost EMI plans without selling assets or blocking credit card limits.
+            <p className="text-xs text-slate-500 max-w-md leading-relaxed">
+              1Fi is India&apos;s pioneering credit-against-investments infrastructure. We enable discerning smartphone buyers to purchase flagship phones without liquidating long-term investments or blocking credit card limits.
             </p>
-            <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
-              <span className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-slate-300">
-                Apple Authorised Resellers
-              </span>
-              <span className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-slate-300">
-                Samsung Official Store
-              </span>
-              <span className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-slate-300">
-                Google Pixel Partner
-              </span>
-              <span className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-slate-300">
-                OnePlus Certified
-              </span>
+            <div className="flex items-center gap-2 pt-1 text-[11px] text-emerald-700 font-semibold">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              <span>CAMS &amp; KFintech API Certified • RBI Compliant NBFC Network</span>
             </div>
           </div>
 
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">Platform Sub-Pages</h3>
-            <ul className="mt-3 space-y-2 text-xs">
-              <li>
-                <Link to="/" className="hover:text-white transition">
-                  Shop All Flagships
-                </Link>
-              </li>
-              <li>
-                <Link to="/wealth-backed-emi" className="text-emerald-400 hover:text-emerald-300 transition">
-                  Wealth EMI &amp; Growth Calculator
-                </Link>
-              </li>
-              <li>
-                <Link to="/portfolio" className="hover:text-white transition">
-                  Portfolio Vault (CAMS / Demat)
-                </Link>
-              </li>
-              <li>
-                <Link to="/compare" className="hover:text-white transition">
-                  Compare Flagships Side-by-Side
-                </Link>
-              </li>
-              <li>
-                <Link to="/orders" className="hover:text-white transition">
-                  Active Loans &amp; Repayment Schedule
-                </Link>
-              </li>
+            <h4 className="font-display text-xs font-bold uppercase tracking-wider text-slate-900 mb-3">
+              Smartphones on EMI
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li><Link to="/products/iphone-17-pro" className="hover:text-indigo-600 transition">Apple iPhone 17 Pro</Link></li>
+              <li><Link to="/products/iphone-16-pro-max" className="hover:text-indigo-600 transition">Apple iPhone 16 Pro Max</Link></li>
+              <li><Link to="/products/samsung-galaxy-s24-ultra" className="hover:text-indigo-600 transition">Samsung Galaxy S24 Ultra</Link></li>
+              <li><Link to="/products/google-pixel-9-pro-xl" className="hover:text-indigo-600 transition">Google Pixel 9 Pro XL</Link></li>
+              <li><Link to="/products/oneplus-13" className="hover:text-indigo-600 transition">OnePlus 13</Link></li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">Popular Flagships</h3>
-            <ul className="mt-3 space-y-2 text-xs">
-              <li>
-                <Link to="/products/iphone-17-pro" className="hover:text-white transition">
-                  iPhone 17 Pro
-                </Link>
-              </li>
-              <li>
-                <Link to="/products/iphone-16-pro-max" className="hover:text-white transition">
-                  iPhone 16 Pro Max
-                </Link>
-              </li>
-              <li>
-                <Link to="/products/samsung-galaxy-s24-ultra" className="hover:text-white transition">
-                  Samsung Galaxy S24 Ultra
-                </Link>
-              </li>
-              <li>
-                <Link to="/products/samsung-galaxy-z-fold-6" className="hover:text-white transition">
-                  Samsung Galaxy Z Fold 6
-                </Link>
-              </li>
-              <li>
-                <Link to="/products/google-pixel-9-pro-xl" className="hover:text-white transition">
-                  Google Pixel 9 Pro XL
-                </Link>
-              </li>
-              <li>
-                <Link to="/products/oneplus-13" className="hover:text-white transition">
-                  OnePlus 13
-                </Link>
-              </li>
+            <h4 className="font-display text-xs font-bold uppercase tracking-wider text-slate-900 mb-3">
+              Wealth Navigation
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li><Link to="/wealth-backed-emi" className="hover:text-indigo-600 transition font-medium text-emerald-700">Wealth EMI Simulator</Link></li>
+              <li><Link to="/portfolio" className="hover:text-indigo-600 transition">Portfolio Vault &amp; Limits</Link></li>
+              <li><Link to="/compare" className="hover:text-indigo-600 transition">Flagship Specs Compare</Link></li>
+              <li><Link to="/orders" className="hover:text-indigo-600 transition">My Active Loans &amp; Orders</Link></li>
+              <li><Link to="/login" className="hover:text-indigo-600 transition">Investor Sign In</Link></li>
             </ul>
           </div>
         </div>
 
-        {/* Legal Disclaimer */}
-        <div className="mt-10 border-t border-white/10 pt-6 text-[11px] text-slate-500 leading-relaxed">
-          <p>
-            Disclaimer: 1Fi Wealth-Backed EMI is a technology demonstration created for the 1Fi SDE1 Take-Home Assignment. All calculations for EMI, interest, cashback, and portfolio growth are derived via rigorous standard reducing-balance math and simulated market CAGR. Mutual Fund investments are subject to market risks; read all scheme related documents carefully.
-          </p>
-          <p className="mt-2 text-slate-400">
-            © {new Date().getFullYear()} 1Fi Technologies. Crafted with React 18, Tailwind Glassmorphism, Node.js Express, and PostgreSQL.
-          </p>
+        <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
+          <p>© {new Date().getFullYear()} 1Fi Technologies Pvt. Ltd. All rights reserved.</p>
+          <div className="flex gap-6">
+            <span className="hover:text-slate-600 cursor-pointer">Security Whitepaper</span>
+            <span className="hover:text-slate-600 cursor-pointer">Fair Practices Code</span>
+            <span className="hover:text-slate-600 cursor-pointer">SEBI Depository Rules</span>
+            <span className="hover:text-slate-600 cursor-pointer">Privacy Policy</span>
+          </div>
         </div>
       </div>
     </footer>

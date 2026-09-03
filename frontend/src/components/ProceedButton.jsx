@@ -9,8 +9,8 @@ export default function ProceedButton({ disabled, onProceed }) {
       className={[
         'group relative flex w-full items-center justify-center gap-2.5 rounded-2xl py-4 px-6 text-sm font-bold text-white shadow-xl transition-all duration-300',
         disabled
-          ? 'cursor-not-allowed bg-slate-800/80 text-slate-500 border border-white/5'
-          : 'bg-gradient-to-r from-brand-600 via-brand-500 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 shadow-glow-brand hover:scale-[1.01] active:scale-[0.99] border border-white/20',
+          ? 'cursor-not-allowed bg-slate-200 text-slate-400 border border-slate-200'
+          : 'bg-gradient-to-r from-indigo-600 via-indigo-700 to-emerald-600 hover:from-indigo-700 hover:to-emerald-700 shadow-indigo-600/20 hover:scale-[1.01] active:scale-[0.99] border border-transparent',
       ].join(' ')}
     >
       <ShieldCheck className="h-4 w-4 text-emerald-300" />

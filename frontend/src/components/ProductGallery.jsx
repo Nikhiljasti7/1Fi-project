@@ -1,63 +1,178 @@
-import { useState } from 'react';
-import { Shield, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Shield, Sparkles, Star, Truck, Check } from 'lucide-react';
 
-export default function ProductGallery({ imageUrl, alt }) {
-  const [failed, setFailed] = useState(false);
-  const [activeAngle, setActiveAngle] = useState(0);
+export default function ProductGallery({ imageUrl, images = [], alt }) {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [zoomStyle, setZoomStyle] = useState({});
 
-  const fallback =
-    'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=1000&q=85';
+  // Build the list of angle gallery photos
+  const galleryList = images && images.length > 0
+    ? images
+    : [
+        {
+          url: imageUrl,
+          label: 'Front & Back View',
+          angle: 'front_back',
+        },
+        {
+          url: imageUrl,
+          label: 'Camera System Close-up',
+          angle: 'camera',
+          transform: 'scale-125 translate-x-3 translate-y-3',
+        },
+        {
+          url: imageUrl,
+          label: 'Titanium Edge Profile',
+          angle: 'side',
+          transform: 'rotate-12 scale-110',
+        },
+        {
+          url: imageUrl,
+          label: 'Display Dynamic View',
+          angle: 'display',
+          transform: '-rotate-6 scale-105',
+        },
+      ];
+
+  // Reset selected image when variant image changes
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [imageUrl]);
+
+  const currentItem = galleryList[selectedIndex] || galleryList[0];
+  const activeUrl = currentItem?.url || imageUrl;
+  const fallback = 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=1000&q=85';
+
+  function handleMouseMove(e) {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomStyle({
+      transformOrigin: `${x}% ${y}%`,
+      transform: 'scale(1.35)',
+    });
+  }
+
+  function handleMouseLeave() {
+    setZoomStyle({
+      transformOrigin: 'center center',
+      transform: 'scale(1)',
+    });
+  }
 
   return (
-    <div className="space-y-4">
-      {/* Main Glass Stage */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-slate-900/80 to-dark-950/90 p-8 backdrop-blur-2xl shadow-glass flex items-center justify-center group">
-        {/* Glow ambient background */}
-        <div className="absolute inset-0 bg-radial-glow opacity-50 transition duration-700 group-hover:opacity-100" />
+    <div className="flex flex-col-reverse md:flex-row gap-4 items-start">
+      {/* Vertical Thumbnail Column (Snapmint / Apple style) */}
+      <div className="flex md:flex-col gap-2.5 overflow-x-auto md:overflow-y-auto max-w-full md:w-20 shrink-0 pb-1 md:pb-0 no-scrollbar">
+        {galleryList.map((item, idx) => {
+          const isSelected = selectedIndex === idx;
+          return (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => setSelectedIndex(idx)}
+              onMouseEnter={() => setSelectedIndex(idx)}
+              aria-label={item.label || `View angle ${idx + 1}`}
+              className={[
+                'relative h-18 w-18 md:h-20 md:w-20 shrink-0 rounded-2xl border p-1.5 transition-all duration-200 bg-white overflow-hidden group',
+                isSelected
+                  ? 'border-indigo-600 ring-2 ring-indigo-500/30 shadow-md scale-[1.02]'
+                  : 'border-slate-200 hover:border-slate-400 opacity-75 hover:opacity-100',
+              ].join(' ')}
+            >
+              <div className="h-full w-full rounded-xl bg-slate-50 flex items-center justify-center overflow-hidden">
+                <img
+                  src={item.thumbUrl || item.url || fallback}
+                  alt={item.label || `Angle ${idx + 1}`}
+                  className={`h-full w-full object-contain p-1 transition duration-300 ${
+                    item.transform && !item.thumbUrl ? item.transform : 'group-hover:scale-110'
+                  }`}
+                  onError={(e) => {
+                    e.currentTarget.src = fallback;
+                  }}
+                />
+              </div>
 
-        {/* Top Badges */}
-        <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-          <span className="flex items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-[11px] font-semibold text-brand-300 backdrop-blur-md">
-            <Sparkles className="h-3 w-3 text-brand-400" />
-            100% Brand Certified
-          </span>
-          <span className="flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-300 backdrop-blur-md">
-            <Shield className="h-3 w-3 text-emerald-400" />
-            Lien Pledge Eligible
-          </span>
-        </div>
-
-        {/* Product Image */}
-        <img
-          src={failed ? fallback : imageUrl || fallback}
-          alt={alt || 'Product image'}
-          className={`relative z-10 max-h-[85%] max-w-[85%] object-contain transition-all duration-500 ${
-            activeAngle === 1 ? 'scale-105 rotate-3' : activeAngle === 2 ? 'scale-105 -rotate-3' : 'group-hover:scale-105'
-          }`}
-          onError={() => setFailed(true)}
-        />
-
-        {/* Subtle shadow beneath device */}
-        <div className="absolute bottom-6 h-6 w-3/4 rounded-full bg-black/60 blur-xl z-0" />
+              {isSelected && (
+                <div className="absolute top-1 right-1 grid h-3.5 w-3.5 place-items-center rounded-full bg-indigo-600 text-white shadow-sm">
+                  <Check className="h-2 w-2 stroke-[3]" />
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Interactive Angle Switcher */}
-      <div className="flex items-center justify-center gap-2">
-        {['Studio Front', 'Dynamic Angle 1', 'Dynamic Angle 2'].map((label, idx) => (
-          <button
-            key={idx}
-            type="button"
-            onClick={() => setActiveAngle(idx)}
-            className={[
-              'rounded-xl border px-3 py-1.5 text-xs font-medium transition backdrop-blur-md',
-              activeAngle === idx
-                ? 'border-brand-500 bg-brand-500/20 text-white shadow-sm'
-                : 'border-white/10 bg-white/5 text-slate-400 hover:text-white hover:border-white/20',
-            ].join(' ')}
-          >
-            {label}
-          </button>
-        ))}
+      {/* Main High-Res Stage */}
+      <div className="flex-1 w-full space-y-3">
+        <div
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          className="relative aspect-square w-full overflow-hidden rounded-3xl border border-slate-200/90 bg-gradient-to-b from-white via-slate-50 to-slate-100/70 p-6 sm:p-10 shadow-card flex items-center justify-center cursor-crosshair group"
+        >
+          {/* Subtle Ambient Light Glow */}
+          <div className="absolute inset-0 bg-radial-light opacity-60 pointer-events-none" />
+
+          {/* Top Stage Badges */}
+          <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2">
+            <span className="flex items-center gap-1 rounded-full border border-indigo-200 bg-white/95 px-3 py-1 text-[11px] font-bold text-indigo-700 shadow-sm backdrop-blur-md">
+              <Sparkles className="h-3 w-3 text-indigo-600" />
+              100% Genuine Sealed
+            </span>
+            <span className="flex items-center gap-1 rounded-full border border-emerald-200 bg-white/95 px-3 py-1 text-[11px] font-bold text-emerald-700 shadow-sm backdrop-blur-md">
+              <Shield className="h-3 w-3 text-emerald-600" />
+              1Fi Verified Lien
+            </span>
+          </div>
+
+          {/* Main Large Image */}
+          <div className="relative z-10 h-full w-full flex items-center justify-center">
+            <img
+              src={activeUrl || fallback}
+              alt={alt || currentItem?.label || 'Product showcase'}
+              style={zoomStyle}
+              className={`max-h-[90%] max-w-[90%] object-contain drop-shadow-2xl transition-transform duration-300 ${
+                currentItem?.transform && !zoomStyle.transform ? currentItem.transform : ''
+              }`}
+              onError={(e) => {
+                e.currentTarget.src = fallback;
+              }}
+            />
+          </div>
+
+          {/* Bottom Floating Photo Angle Label */}
+          <div className="absolute bottom-4 left-4 z-20">
+            <span className="rounded-full bg-white/90 border border-slate-200/90 px-3 py-1 text-[11px] font-semibold text-slate-700 shadow-sm backdrop-blur-md">
+              {currentItem?.label || 'Front & Back View'}
+            </span>
+          </div>
+
+          {/* Bottom Right Rating Pill */}
+          <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 rounded-full bg-white/90 border border-slate-200/90 px-3 py-1 text-xs font-bold text-slate-800 shadow-sm backdrop-blur-md">
+            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+            <span>4.9</span>
+            <span className="text-slate-400 font-normal text-[10px]">(500+ reviews)</span>
+          </div>
+
+          {/* Device Floor Shadow */}
+          <div className="absolute bottom-6 h-6 w-3/4 rounded-full bg-slate-400/20 blur-xl pointer-events-none z-0" />
+        </div>
+
+        {/* Value Highlights under the photo (Snapmint / E-commerce style) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] text-slate-600 pt-1">
+          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm">
+            <Truck className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
+            <span className="truncate">Free Express Insured Delivery</span>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50/70 p-2.5 text-emerald-800 shadow-sm">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <span className="truncate">Up to ₹11,000 Direct Cashback</span>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm col-span-2 sm:col-span-1">
+            <Shield className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <span className="truncate">1-Yr Official Brand Warranty</span>
+          </div>
+        </div>
       </div>
     </div>
   );

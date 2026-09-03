@@ -85,4 +85,25 @@ export function prepayOrder(orderId) {
   });
 }
 
+export function loginUser(credentials) {
+  return request('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(credentials),
+  });
+}
+
+export function forgotPasswordUser(payload) {
+  return request('/api/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function resetPasswordUser(payload) {
+  return request('/api/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
 export { ApiError };

@@ -5,6 +5,7 @@ const pool = require('./db/pool');
 const { checkPostgres } = require('./db/dbService');
 const productsRouter = require('./routes/products');
 const wealthRouter = require('./routes/wealth');
+const authRouter = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -35,6 +36,7 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+app.use('/api/auth', authRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/wealth', wealthRouter);
 // Direct alias for orders
