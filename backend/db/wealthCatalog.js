@@ -150,36 +150,46 @@ const APPROVED_STOCKS = [
 // In-memory orders store
 let activeOrders = [
   {
+    id: '1FI-ORD-98214',
     orderId: '1FI-ORD-98214',
     loanAccountNumber: '1FI-LAMF-884021',
     createdAt: new Date(Date.now() - 15 * 86400000).toISOString(),
+    status: 'ACTIVE',
+    lienReleased: false,
+    emisPaid: 1,
     product: {
       name: 'iPhone 16 Pro Max',
+      brand: 'Apple',
       variantLabel: '256GB / Desert Titanium',
-      sellingPrice: 139900,
-      imageUrl: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=1000&q=85',
+      sellingPrice: 144900,
+      imageUrl: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1000&q=85',
     },
     plan: {
       tenureMonths: 12,
-      monthlyPayment: 11658.33,
+      monthlyPayment: 12075,
       annualInterestRate: 0,
       cashbackAmount: 8000,
-      totalPayable: 139900,
-      effectiveAmountAfterCashback: 131900,
+      totalPayable: 144900,
+      effectiveAmountAfterCashback: 136900,
     },
     pledgedAsset: {
       type: 'MUTUAL_FUND',
       name: 'Parag Parikh Flexi Cap Fund',
-      unitsPledged: 332,
-      pledgedValue: 279600,
-      ltvAllowed: 139800,
+      unitsPledged: 344,
+      pledgedValue: 289800,
+      ltvAllowed: 144900,
+    },
+    bankDetails: {
+      bankName: 'HDFC Bank Ltd',
+      accountMasked: '•••• 4128',
+      ifsc: 'HDFC0001234',
     },
     repaymentSchedule: {
       totalEmis: 12,
       paidEmis: 1,
       nextEmiDate: new Date(Date.now() + 15 * 86400000).toISOString().slice(0, 10),
       autoDebitStatus: 'ACTIVE_ENACH',
-      bankName: 'HDFC Bank (•••• 4128)',
+      bankName: 'HDFC Bank Ltd (•••• 4128)',
     },
     lienStatus: 'ACTIVE_LIEN',
     deliveryStatus: 'DELIVERED',
@@ -200,19 +210,29 @@ function getActiveOrders() {
 function addOrder(orderData) {
   const orderId = `1FI-ORD-${Math.floor(10000 + Math.random() * 90000)}`;
   const loanAccountNumber = `1FI-LAMF-${Math.floor(100000 + Math.random() * 900000)}`;
+  const totalEmis = orderData.plan?.tenureMonths || 12;
   const newOrder = {
+    id: orderId,
     orderId,
     loanAccountNumber,
     createdAt: new Date().toISOString(),
+    status: 'ACTIVE',
+    lienReleased: false,
+    emisPaid: 0,
     ...orderData,
     lienStatus: 'ACTIVE_LIEN',
     deliveryStatus: 'PROCESSING',
+    bankDetails: {
+      bankName: orderData.bankDetails?.bankName || 'HDFC Bank Ltd',
+      accountMasked: orderData.bankDetails?.accountMasked || '•••• 4128',
+      ifsc: orderData.bankDetails?.ifsc || 'HDFC0001234',
+    },
     repaymentSchedule: {
-      totalEmis: orderData.plan.tenureMonths,
+      totalEmis,
       paidEmis: 0,
       nextEmiDate: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
       autoDebitStatus: 'ACTIVE_ENACH',
-      bankName: orderData.bankDetails?.bankName || 'Verified Salaried Account (•••• 7821)',
+      bankName: `${orderData.bankDetails?.bankName || 'HDFC Bank Ltd'} (${orderData.bankDetails?.accountMasked || '•••• 4128'})`,
     },
   };
   activeOrders.unshift(newOrder);
@@ -220,13 +240,20 @@ function addOrder(orderData) {
 }
 
 function prepayOrderEmi(orderId) {
-  const order = activeOrders.find((o) => o.orderId === orderId);
+  const order = activeOrders.find((o) => o.id === orderId || o.orderId === orderId);
   if (!order) return null;
-  order.repaymentSchedule.paidEmis = Math.min(
-    order.repaymentSchedule.paidEmis + 1,
-    order.repaymentSchedule.totalEmis
-  );
-  if (order.repaymentSchedule.paidEmis === order.repaymentSchedule.totalEmis) {
+  const total = order.plan?.tenureMonths || order.repaymentSchedule?.totalEmis || 12;
+  const currentPaid = (order.emisPaid ?? order.repaymentSchedule?.paidEmis ?? 0) + 1;
+  const newPaid = Math.min(currentPaid, total);
+
+  order.emisPaid = newPaid;
+  if (order.repaymentSchedule) {
+    order.repaymentSchedule.paidEmis = newPaid;
+  }
+
+  if (newPaid >= total) {
+    order.status = 'COMPLETED';
+    order.lienReleased = true;
     order.lienStatus = 'LIEN_RELEASED';
     order.deliveryStatus = 'LOAN_CLOSED';
   }

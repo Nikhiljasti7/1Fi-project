@@ -11,14 +11,16 @@ import ComparePage from './pages/ComparePage.jsx';
 import OrdersPage from './pages/OrdersPage.jsx';
 import TermsPage from './pages/TermsPage.jsx';
 import PrivacyPage from './pages/PrivacyPage.jsx';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 export default function App() {
   return (
-    <AuthProvider>
-      <div className="min-h-screen flex flex-col bg-[#F8F9FA] text-slate-900 font-sans selection:bg-indigo-600 selection:text-white">
-        <Navbar />
-        <main className="flex-1">
+    <ErrorBoundary>
+      <AuthProvider>
+        <div className="min-h-screen flex flex-col bg-[#F8F9FA] text-slate-900 font-sans selection:bg-indigo-600 selection:text-white">
+          <Navbar />
+          <main className="flex-1">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -35,5 +37,6 @@ export default function App() {
         <Footer />
       </div>
     </AuthProvider>
-  );
+  </ErrorBoundary>
+);
 }

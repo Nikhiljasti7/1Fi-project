@@ -6,13 +6,8 @@ import {
   PackageCheck,
   ShieldCheck,
   CheckCircle2,
-  Lock,
   Smartphone,
-  Calendar,
-  Building2,
   ArrowRight,
-  FileDown,
-  Sparkles,
 } from 'lucide-react';
 
 export default function OrdersPage() {
@@ -23,10 +18,11 @@ export default function OrdersPage() {
   const fetchOrders = () => {
     getOrders()
       .then((res) => {
-        setOrders(res || []);
+        setOrders(Array.isArray(res) ? res : []);
         setLoading(false);
       })
       .catch(() => {
+        setOrders([]);
         setLoading(false);
       });
   };
@@ -36,9 +32,10 @@ export default function OrdersPage() {
   }, []);
 
   async function handlePrepay(orderId) {
+    if (!orderId) return;
     try {
       const res = await prepayOrder(orderId);
-      setNotification(res.message);
+      setNotification(res?.message || '1-Month EMI Prepayment recorded successfully!');
       fetchOrders();
       setTimeout(() => setNotification(null), 6000);
     } catch (err) {
@@ -47,7 +44,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 space-y-10 bg-slate-50">
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 space-y-10 bg-[#F8F9FA] min-h-[80vh]">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
@@ -113,32 +110,58 @@ export default function OrdersPage() {
 
       {!loading && orders.length > 0 && (
         <div className="space-y-6">
-          {orders.map((order) => {
-            const progress = Math.min(100, Math.round((order.emisPaid / order.plan.tenureMonths) * 100));
-            const remainingEmis = order.plan.tenureMonths - order.emisPaid;
+          {orders.map((order, idx) => {
+            const orderId = order.id || order.orderId || `1FI-ORD-${idx + 1}`;
+            const lan = order.loanAccountNumber || '1FI-LAMF-884021';
+            const totalEmis = order.plan?.tenureMonths || order.repaymentSchedule?.totalEmis || 12;
+            const emisPaid = order.emisPaid ?? order.repaymentSchedule?.paidEmis ?? 0;
+            const progress = totalEmis > 0 ? Math.min(100, Math.round((emisPaid / totalEmis) * 100)) : 0;
+            const remainingEmis = Math.max(0, totalEmis - emisPaid);
+            const isLienReleased = order.lienReleased || order.lienStatus === 'LIEN_RELEASED' || remainingEmis === 0;
+
+            const productName = order.product?.name || 'Flagship Smartphone';
+            const productBrand = order.product?.brand || 'Apple';
+            const variantLabel = order.product?.variantLabel || '256GB';
+            const sellingPrice = order.product?.sellingPrice || 144900;
+            const imageUrl =
+              order.product?.imageUrl ||
+              'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=800&q=80';
+
+            const monthlyPayment = order.plan?.monthlyPayment || Math.round(sellingPrice / totalEmis);
+            const interestRate = order.plan?.annualInterestRate ?? 0;
+
+            const pledgedName = order.pledgedAsset?.name || 'Approved Mutual Fund Folio';
+            const unitsPledged = order.pledgedAsset?.unitsPledged || 344;
+            const pledgedValue = order.pledgedAsset?.pledgedValue || 289800;
+
+            const bankName =
+              order.bankDetails?.bankName ||
+              order.repaymentSchedule?.bankName ||
+              'HDFC Bank Ltd';
+            const accountMasked = order.bankDetails?.accountMasked || '•••• 4128';
 
             return (
               <div
-                key={order.id}
+                key={orderId}
                 className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6"
               >
                 {/* Order Top Bar */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                   <div className="flex items-center gap-3">
                     <span className="font-mono text-xs font-bold text-slate-500">
-                      Order ID: <strong className="text-slate-900">{order.id}</strong>
+                      Order ID: <strong className="text-slate-900">{orderId}</strong>
                     </span>
                     <span className="text-slate-300">•</span>
                     <span className="font-mono text-xs font-bold text-indigo-600">
-                      LAN: {order.loanAccountNumber}
+                      LAN: {lan}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <span className="rounded-full bg-emerald-50 border border-emerald-200 px-3 py-0.5 text-[11px] font-bold text-emerald-800">
-                      {order.status === 'ACTIVE' ? 'Active Auto-Debit' : order.status}
+                      {isLienReleased ? 'Loan Closed' : 'Active Auto-Debit'}
                     </span>
-                    {order.lienReleased && (
+                    {isLienReleased && (
                       <span className="rounded-full bg-indigo-50 border border-indigo-200 px-3 py-0.5 text-[11px] font-bold text-indigo-700 flex items-center gap-1">
                         <CheckCircle2 className="h-3 w-3" />
                         Lien Released
@@ -151,36 +174,40 @@ export default function OrdersPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
                   <div className="lg:col-span-5 flex items-center gap-4">
                     <img
-                      src={order.product.imageUrl}
-                      alt={order.product.name}
-                      className="h-20 w-20 rounded-2xl object-contain bg-slate-50 p-2 border border-slate-100 shadow-sm shrink-0"
+                      src={imageUrl}
+                      alt={productName}
+                      className="h-20 w-20 rounded-xl object-contain bg-slate-50 p-2 border border-slate-100 shadow-sm shrink-0"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=800&q=80';
+                      }}
                     />
                     <div>
                       <span className="text-[10px] font-bold uppercase text-slate-400">
-                        {order.product.brand}
+                        {productBrand}
                       </span>
                       <h3 className="font-display font-bold text-base text-slate-900">
-                        {order.product.name}
+                        {productName}
                       </h3>
-                      <p className="text-xs text-slate-500 font-medium">{order.product.variantLabel}</p>
+                      <p className="text-xs text-slate-500 font-medium">{variantLabel}</p>
                       <div className="mt-1 text-xs font-extrabold text-slate-900">
-                        Device Value: {formatINR(order.product.sellingPrice)}
+                        Device Value: {formatINR(sellingPrice)}
                       </div>
                     </div>
                   </div>
 
-                  <div className="lg:col-span-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-xs space-y-2">
+                  <div className="lg:col-span-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-xs space-y-2">
                     <div className="flex justify-between">
                       <span className="text-slate-500">Monthly EMI Debit:</span>
-                      <span className="font-extrabold text-slate-900">{formatINR(order.plan.monthlyPayment)} / mo</span>
+                      <span className="font-extrabold text-slate-900">{formatINR(monthlyPayment)} / mo</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Tenure Duration:</span>
-                      <span className="font-bold text-slate-800">{order.plan.tenureMonths} Months</span>
+                      <span className="font-bold text-slate-800">{totalEmis} Months</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Interest Subvention:</span>
-                      <span className="font-bold text-emerald-700">{order.plan.annualInterestRate}% (No-Cost)</span>
+                      <span className="font-bold text-emerald-700">{interestRate}% (No-Cost)</span>
                     </div>
                   </div>
 
@@ -188,10 +215,10 @@ export default function OrdersPage() {
                     <button
                       type="button"
                       disabled={remainingEmis <= 0}
-                      onClick={() => handlePrepay(order.id)}
-                      className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 py-2.5 px-4 text-xs font-bold text-white shadow-md shadow-emerald-600/20 hover:from-emerald-700 hover:to-emerald-800 transition disabled:opacity-40"
+                      onClick={() => handlePrepay(orderId)}
+                      className="w-full rounded-xl bg-indigo-600 py-2.5 px-4 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      {remainingEmis > 0 ? 'Simulate 1-Month Prepayment' : 'Loan Fully Closed ✓'}
+                      {remainingEmis > 0 ? 'Simulate 1-Month Prepayment' : 'Loan Fully Closed'}
                     </button>
                     <span className="block text-[10px] text-slate-400">
                       0% Foreclosure Penalty
@@ -203,28 +230,28 @@ export default function OrdersPage() {
                 <div className="space-y-2 pt-2">
                   <div className="flex justify-between text-xs">
                     <span className="font-bold text-slate-700">
-                      Repayment Progress: {order.emisPaid} of {order.plan.tenureMonths} EMIs Paid
+                      Repayment Progress: {emisPaid} of {totalEmis} EMIs Paid
                     </span>
                     <span className="font-extrabold text-emerald-700">{progress}%</span>
                   </div>
-                  <div className="h-2.5 w-full rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                  <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden border border-slate-200">
                     <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-indigo-600 rounded-full transition-all duration-500"
+                      className="h-full bg-emerald-600 rounded-full transition-all duration-300"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
                 </div>
 
                 {/* Collateral Lien Details Box */}
-                <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0" />
                     <div>
                       <span className="font-bold text-slate-900 block">
-                        Pledged Collateral: {order.pledgedAsset.name}
+                        Pledged Collateral: {pledgedName}
                       </span>
                       <span className="text-slate-600 text-[11px]">
-                        {order.pledgedAsset.unitsPledged} Units Under Lien • Value: {formatINR(order.pledgedAsset.pledgedValue)}
+                        {unitsPledged} Units Under Lien • Value: {formatINR(pledgedValue)}
                       </span>
                     </div>
                   </div>
@@ -234,7 +261,7 @@ export default function OrdersPage() {
                       Auto-Debit Mandate
                     </span>
                     <span className="text-xs font-bold text-slate-900">
-                      {order.bankDetails.bankName} ({order.bankDetails.accountMasked})
+                      {bankName} ({accountMasked})
                     </span>
                   </div>
                 </div>
