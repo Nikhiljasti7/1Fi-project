@@ -6,12 +6,17 @@ const { checkPostgres } = require('./db/dbService');
 const productsRouter = require('./routes/products');
 const wealthRouter = require('./routes/wealth');
 const authRouter = require('./routes/auth');
+const securityHeaders = require('./middleware/securityHeaders');
+const { sanitizeInputMiddleware } = require('./middleware/validation');
+const { orderLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+app.use(securityHeaders);
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
+app.use(sanitizeInputMiddleware);
 
 app.get('/api/health', async (req, res) => {
   try {
@@ -39,8 +44,8 @@ app.get('/api/health', async (req, res) => {
 app.use('/api/auth', authRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/wealth', wealthRouter);
-// Direct alias for orders
-app.use('/api/orders', wealthRouter);
+// Direct alias for orders with rate limiting protection
+app.use('/api/orders', orderLimiter, wealthRouter);
 
 // 404 handler
 app.use((req, res) => {

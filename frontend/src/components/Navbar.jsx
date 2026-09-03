@@ -42,14 +42,14 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl shadow-subtle">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         {/* Brand Logo */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <Logo className="h-9 w-9 transition-transform duration-200 group-hover:scale-105" />
+        <Link to="/" className="flex items-center gap-3">
+          <Logo className="h-9 w-9" />
           <div>
             <div className="flex items-center gap-2">
               <span className="font-display font-extrabold text-lg text-slate-900 tracking-tight">
-                1Fi <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-emerald-600">Wealth</span>
+                1Fi <span className="text-indigo-600">Wealth</span>
               </span>
-              <span className="rounded-full bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
+              <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-800 uppercase tracking-wider">
                 LAMF Engine
               </span>
             </div>

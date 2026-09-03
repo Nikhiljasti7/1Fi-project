@@ -118,27 +118,31 @@ function calculateOffset(req, res) {
 function createOrder(req, res) {
   const { product, plan, pledgedAsset, customer, bankDetails } = req.body;
 
-  if (!product || !plan || !pledgedAsset) {
+  if (!product || !plan || !pledgedAsset || !plan.tenureMonths || !plan.monthlyPayment) {
     return res.status(400).json({
       success: false,
-      error: { code: 'INVALID_ORDER_PAYLOAD', message: 'Missing product, plan, or pledged asset details' },
+      error: { code: 'INVALID_ORDER_PAYLOAD', message: 'Missing or malformed product, plan, or pledged asset details.' },
     });
   }
+
+  // Security: Mask PAN and bank account (Rule 5)
+  const rawPan = customer?.pan || 'ABCPS8912K';
+  const safePan = rawPan.length >= 4 ? `•••••${rawPan.slice(-4)}` : '•••••8912K';
 
   const order = addOrder({
     product,
     plan,
     pledgedAsset,
-    customer: customer || {
-      name: 'Nikhil Sharma',
-      pan: 'ABCPS8912K',
-      phone: '+91 98765 43210',
-      email: 'nikhil.sharma@example.com',
+    customer: {
+      name: customer?.name || 'Nikhil Jasti',
+      pan: safePan,
+      phone: customer?.phone || '+91 98765 43210',
+      email: customer?.email || 'nikhil.jasti@example.com',
     },
-    bankDetails: bankDetails || {
-      bankName: 'HDFC Bank Ltd',
-      accountMasked: '•••• 4128',
-      ifsc: 'HDFC0001234',
+    bankDetails: {
+      bankName: bankDetails?.bankName || 'HDFC Bank Ltd',
+      accountMasked: bankDetails?.accountMasked || '•••• 4128',
+      ifsc: bankDetails?.ifsc || 'HDFC0001234',
     },
   });
 

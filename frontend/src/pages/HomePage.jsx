@@ -84,49 +84,45 @@ export default function HomePage() {
   return (
     <div className="space-y-12 pb-16 bg-slate-50">
       {/* ================= HERO SECTION ================= */}
-      <section className="relative overflow-hidden pt-12 pb-20 border-b border-slate-200/80 bg-gradient-to-b from-white via-slate-50 to-slate-100/60">
-        {/* Soft aesthetic ambient gradients */}
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-96 w-[700px] rounded-full bg-gradient-to-tr from-indigo-200/40 via-purple-200/30 to-emerald-200/40 blur-3xl pointer-events-none" />
-        <div className="absolute top-1/3 right-10 h-72 w-72 rounded-full bg-emerald-200/30 blur-3xl pointer-events-none" />
-
+      <section className="relative overflow-hidden pt-12 pb-16 border-b border-slate-200/80 bg-white">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center">
             {/* Top Tag */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-xs font-semibold text-emerald-800 backdrop-blur-xl shadow-sm mb-6">
-              <Sparkles className="h-3.5 w-3.5 text-emerald-600 animate-pulse" />
-              <span>India&apos;s First Wealth-Backed Smartphone Marketplace (LAMF)</span>
+            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1 text-xs font-semibold text-slate-700 shadow-sm mb-6">
+              <ShieldCheck className="h-3.5 w-3.5 text-indigo-600" />
+              <span>India&apos;s Regulated Wealth-Backed Smartphone Marketplace (LAMF)</span>
             </div>
 
             {/* Headline */}
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 max-w-4xl leading-tight">
               Buy Your Dream Flagship.{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-indigo-700 to-emerald-600">
+              <span className="block text-indigo-600">
                 Backed By Your Wealth.
               </span>
             </h1>
 
             {/* Subhead */}
             <p className="mt-5 text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
-              Don&apos;t block credit card limits or break your Mutual Fund SIPs. Pledge units via CAMS &amp; Demat, get <strong className="text-slate-900">0% No-Cost EMI</strong>, and let your portfolio compound at 12–18% while you upgrade.
+              Pledge your mutual fund folios or demat holdings at 50% LTV to unlock <strong className="text-slate-900 font-semibold">0% No-Cost EMI</strong> without liquidating your investments or blocking high credit card limits.
             </p>
 
             {/* Core Value Props */}
             <div className="mt-8 flex flex-wrap justify-center gap-3 text-xs sm:text-sm">
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-3.5 py-2 text-slate-700 shadow-sm">
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-slate-700 shadow-sm">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                <span>₹0 Card Limit Blocked</span>
+                <span>Zero Credit Card Limit Blocked</span>
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-3.5 py-2 text-slate-700 shadow-sm">
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-slate-700 shadow-sm">
                 <TrendingUp className="h-4 w-4 text-indigo-600" />
-                <span>Keep Earning 14% CAGR</span>
+                <span>Portfolio Compounding Intact (14% CAGR)</span>
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-3.5 py-2 text-slate-700 shadow-sm">
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-slate-700 shadow-sm">
                 <Lock className="h-4 w-4 text-emerald-600" />
-                <span>Instant Lien Release</span>
+                <span>Automated Depository Lien Release</span>
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-3.5 py-2 text-slate-700 shadow-sm">
-                <Zap className="h-4 w-4 text-amber-600" />
-                <span>Up to ₹11,000 Cashback</span>
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-slate-700 shadow-sm">
+                <Zap className="h-4 w-4 text-indigo-600" />
+                <span>Up to ₹11,000 Direct Cashback</span>
               </div>
             </div>
 
@@ -134,17 +130,17 @@ export default function HomePage() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <a
                 href="#catalog"
-                className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:from-indigo-700 hover:to-indigo-800"
+                className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors"
               >
-                <span>Browse Famous Flagships</span>
+                <span>Browse Verified Flagships</span>
                 <ArrowRight className="h-4 w-4" />
               </a>
 
               <Link
                 to="/wealth-backed-emi"
-                className="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-6 py-3.5 text-sm font-bold text-emerald-800 shadow-sm transition hover:bg-emerald-100/80"
+                className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
               >
-                <TrendingUp className="h-4 w-4 text-emerald-600" />
+                <TrendingUp className="h-4 w-4 text-slate-500" />
                 <span>Simulate Wealth Compounding</span>
               </Link>
             </div>

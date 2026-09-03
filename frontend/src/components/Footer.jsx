@@ -59,7 +59,7 @@ export default function Footer() {
             <div className="flex items-center gap-3">
               <Logo className="h-9 w-9" />
               <span className="font-display font-bold text-xl text-slate-900">
-                1Fi <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-emerald-600">Wealth-Backed EMI</span>
+                1Fi <span className="text-indigo-600">Wealth-Backed EMI</span>
               </span>
             </div>
             <p className="text-xs text-slate-500 max-w-md leading-relaxed">
@@ -76,8 +76,8 @@ export default function Footer() {
               Smartphones on EMI
             </h4>
             <ul className="space-y-2 text-xs">
-              <li><Link to="/products/iphone-17-pro" className="hover:text-indigo-600 transition">Apple iPhone 17 Pro</Link></li>
               <li><Link to="/products/iphone-16-pro-max" className="hover:text-indigo-600 transition">Apple iPhone 16 Pro Max</Link></li>
+              <li><Link to="/products/iphone-16-pro" className="hover:text-indigo-600 transition">Apple iPhone 16 Pro</Link></li>
               <li><Link to="/products/samsung-galaxy-s24-ultra" className="hover:text-indigo-600 transition">Samsung Galaxy S24 Ultra</Link></li>
               <li><Link to="/products/google-pixel-9-pro-xl" className="hover:text-indigo-600 transition">Google Pixel 9 Pro XL</Link></li>
               <li><Link to="/products/oneplus-13" className="hover:text-indigo-600 transition">OnePlus 13</Link></li>
@@ -101,10 +101,10 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
           <p>© {new Date().getFullYear()} 1Fi Technologies Pvt. Ltd. All rights reserved.</p>
           <div className="flex gap-6">
-            <span className="hover:text-slate-600 cursor-pointer">Security Whitepaper</span>
-            <span className="hover:text-slate-600 cursor-pointer">Fair Practices Code</span>
-            <span className="hover:text-slate-600 cursor-pointer">SEBI Depository Rules</span>
-            <span className="hover:text-slate-600 cursor-pointer">Privacy Policy</span>
+            <Link to="/terms" className="hover:text-slate-700 transition">Terms of Service</Link>
+            <Link to="/privacy" className="hover:text-slate-700 transition">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-slate-700 transition">Fair Practices Code</Link>
+            <Link to="/terms" className="hover:text-slate-700 transition">SEBI Depository Rules</Link>
           </div>
         </div>
       </div>

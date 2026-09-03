@@ -2,9 +2,16 @@ node_modules/
 dist/
 build/
 .env
-.env.local
+.env.*
+!.env.example
 *.log
+*.pem
+*.key
+*.cert
+secrets/
+credentials.json
 .DS_Store
 .vscode/
 .idea/
 coverage/
+.system_generated/

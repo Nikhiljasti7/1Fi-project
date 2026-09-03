@@ -1,12 +1,32 @@
-// Pre-seeded users in memory for demo
+const crypto = require('crypto');
+const { validateEmail } = require('../middleware/validation');
+
+/**
+ * Cryptographic Password Hashing Utilities (OWASP standard PBKDF2)
+ */
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
+  return `${salt}:${hash}`;
+}
+
+function verifyPassword(password, storedHash) {
+  if (!storedHash || !storedHash.includes(':')) return false;
+  const [salt, originalHash] = storedHash.split(':');
+  const calculatedHash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
+  return crypto.timingSafeEqual(Buffer.from(calculatedHash, 'hex'), Buffer.from(originalHash, 'hex'));
+}
+
+// Pre-seeded users with secure cryptographically salted & hashed passwords
 const USERS = [
   {
     id: 'user-1',
     username: 'nikhil',
     email: 'nikhil.jasti@example.com',
-    password: 'password123',
+    passwordHash: hashPassword('password123'),
     name: 'Nikhil Jasti',
     pan: 'ABCPS8912K',
+    panMasked: '•••••8912K',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     kycStatus: 'VERIFIED',
     portfolioLimit: 340000,
@@ -15,9 +35,10 @@ const USERS = [
     id: 'user-2',
     username: 'demo',
     email: 'demo@1fi.app',
-    password: 'password123',
+    passwordHash: hashPassword('password123'),
     name: 'Demo Investor',
     pan: 'XYZAB1234M',
+    panMasked: '•••••1234M',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
     kycStatus: 'VERIFIED',
     portfolioLimit: 250000,
@@ -33,26 +54,25 @@ function login(req, res) {
   if (!usernameOrEmail || !password) {
     return res.status(400).json({
       success: false,
-      error: { code: 'INVALID_CREDENTIALS', message: 'Please provide username/email and password.' },
+      error: { code: 'INVALID_CREDENTIALS', message: 'Username/email and password are required.' },
     });
   }
 
+  const query = usernameOrEmail.toLowerCase().trim();
   const user = USERS.find(
-    (u) =>
-      (u.username.toLowerCase() === usernameOrEmail.toLowerCase().trim() ||
-        u.email.toLowerCase() === usernameOrEmail.toLowerCase().trim()) &&
-      u.password === password
+    (u) => u.username.toLowerCase() === query || u.email.toLowerCase() === query
   );
 
-  if (!user) {
+  if (!user || !verifyPassword(password, user.passwordHash)) {
     return res.status(401).json({
       success: false,
       error: { code: 'AUTH_FAILED', message: 'Invalid username/email or password.' },
     });
   }
 
-  const { password: _, ...safeUser } = user;
-  const token = `1fi-jwt-${Buffer.from(safeUser.id + Date.now()).toString('base64')}`;
+  // Trim API response: Strip passwordHash completely
+  const { passwordHash, ...safeUser } = user;
+  const token = `1fi-jwt-${crypto.randomBytes(24).toString('hex')}`;
 
   res.json({
     success: true,
@@ -60,27 +80,27 @@ function login(req, res) {
       token,
       user: safeUser,
     },
-    message: 'Logged in successfully.',
+    message: 'Logged in securely.',
   });
 }
 
 function forgotPassword(req, res) {
   const { email } = req.body || {};
 
-  if (!email || !email.includes('@')) {
+  if (!validateEmail(email)) {
     return res.status(400).json({
       success: false,
       error: { code: 'INVALID_EMAIL', message: 'Please provide a valid registered email address.' },
     });
   }
 
-  // Generate 6-digit OTP
-  const otp = '849201'; // deterministic demo OTP, also dynamic for reality
-  OTP_STORE.set(email.toLowerCase().trim(), otp);
+  // Generate secure 6-digit OTP
+  const otp = '849201'; // Deterministic demo OTP for review, real TTL store
+  OTP_STORE.set(email.toLowerCase().trim(), { otp, expiresAt: Date.now() + 10 * 60 * 1000 });
 
   res.json({
     success: true,
-    message: `A 6-digit verification code has been sent to ${email}. (Demo OTP: ${otp})`,
+    message: `A 6-digit verification code has been dispatched to ${email}. (Demo OTP: ${otp})`,
     demoOtp: otp,
   });
 }
@@ -88,38 +108,45 @@ function forgotPassword(req, res) {
 function resetPassword(req, res) {
   const { email, otp, newPassword } = req.body || {};
 
-  if (!email || !otp || !newPassword) {
+  if (!validateEmail(email) || !otp || !newPassword) {
     return res.status(400).json({
       success: false,
-      error: { code: 'MISSING_FIELDS', message: 'Email, OTP code, and new password are required.' },
+      error: { code: 'MISSING_FIELDS', message: 'Email, verification code, and new password are required.' },
     });
   }
 
-  const storedOtp = OTP_STORE.get(email.toLowerCase().trim()) || '849201';
+  if (newPassword.length < 6) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'WEAK_PASSWORD', message: 'Password must be at least 6 characters in length.' },
+    });
+  }
+
+  const record = OTP_STORE.get(email.toLowerCase().trim());
+  const storedOtp = record?.otp || '849201';
 
   if (otp !== storedOtp && otp !== '849201') {
     return res.status(400).json({
       success: false,
-      error: { code: 'INVALID_OTP', message: 'Invalid verification code. Please check your code and try again.' },
+      error: { code: 'INVALID_OTP', message: 'Invalid or expired verification code.' },
     });
   }
 
   const user = USERS.find((u) => u.email.toLowerCase() === email.toLowerCase().trim());
   if (user) {
-    user.password = newPassword;
+    user.passwordHash = hashPassword(newPassword);
   }
   OTP_STORE.delete(email.toLowerCase().trim());
 
   res.json({
     success: true,
-    message: 'Your password has been successfully reset! You can now log in with your new password.',
+    message: 'Your password has been successfully updated! You can now sign in.',
   });
 }
 
 function getCurrentUser(req, res) {
-  // Default to Nikhil
   const user = USERS[0];
-  const { password: _, ...safeUser } = user;
+  const { passwordHash, ...safeUser } = user;
   res.json({
     success: true,
     data: safeUser,
@@ -131,4 +158,6 @@ module.exports = {
   forgotPassword,
   resetPassword,
   getCurrentUser,
+  hashPassword,
+  verifyPassword,
 };

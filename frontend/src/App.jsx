@@ -9,12 +9,14 @@ import WealthEmiSimulatorPage from './pages/WealthEmiSimulatorPage.jsx';
 import PortfolioVaultPage from './pages/PortfolioVaultPage.jsx';
 import ComparePage from './pages/ComparePage.jsx';
 import OrdersPage from './pages/OrdersPage.jsx';
+import TermsPage from './pages/TermsPage.jsx';
+import PrivacyPage from './pages/PrivacyPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 export default function App() {
   return (
     <AuthProvider>
-      <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-indigo-600 selection:text-white">
+      <div className="min-h-screen flex flex-col bg-[#F8F9FA] text-slate-900 font-sans selection:bg-indigo-600 selection:text-white">
         <Navbar />
         <main className="flex-1">
           <Routes>
@@ -25,6 +27,8 @@ export default function App() {
             <Route path="/portfolio" element={<PortfolioVaultPage />} />
             <Route path="/compare" element={<ComparePage />} />
             <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>

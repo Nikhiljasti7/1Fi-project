@@ -5,7 +5,6 @@ import { formatINR } from '../utils/format.js';
 import {
   ArrowLeftRight,
   ShieldCheck,
-  Sparkles,
   Smartphone,
   Cpu,
   Camera,
@@ -106,7 +105,7 @@ export default function ComparePage() {
           return (
             <div
               key={product.id || idx}
-              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-6 relative group"
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6 relative group"
             >
               {compared.length > 2 && (
                 <button

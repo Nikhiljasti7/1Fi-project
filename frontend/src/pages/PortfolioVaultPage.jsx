@@ -75,7 +75,7 @@ export default function PortfolioVaultPage() {
           <button
             type="button"
             onClick={() => setIsLinkingModal(true)}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:from-indigo-700 hover:to-indigo-800 transition"
+            className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors"
           >
             <Plus className="h-4 w-4" />
             <span>Link New Folio / Demat</span>
@@ -84,10 +84,10 @@ export default function PortfolioVaultPage() {
       </div>
 
       {linkSuccess && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800 flex items-center justify-between shadow-sm">
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-            <span>Successfully synced with CAMS! Your borrowing limit has increased by ₹1,20,000.</span>
+            <span>Successfully synced with CAMS. Your borrowing limit has increased by ₹1,20,000.</span>
           </div>
           <button type="button" onClick={() => setLinkSuccess(false)} className="text-emerald-700 font-bold">
             Dismiss
@@ -98,7 +98,7 @@ export default function PortfolioVaultPage() {
       {/* 4 Financial Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Total Linked Portfolio */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-1">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
             Total Linked Portfolio
           </span>
@@ -112,7 +112,7 @@ export default function PortfolioVaultPage() {
         </div>
 
         {/* Approved Credit Limit */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-1">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
             Approved Borrowing Limit
           </span>
@@ -125,7 +125,7 @@ export default function PortfolioVaultPage() {
         </div>
 
         {/* Active Lien Locked */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-1">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
             Active Lien Locked
           </span>
@@ -138,7 +138,7 @@ export default function PortfolioVaultPage() {
         </div>
 
         {/* Free Limit Available */}
-        <div className="rounded-3xl border border-emerald-200 bg-emerald-50/70 p-6 shadow-sm space-y-1">
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-6 shadow-sm space-y-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 block">
             Available For New Devices
           </span>
@@ -146,14 +146,13 @@ export default function PortfolioVaultPage() {
             {formatINR(freeAvailableLimit || 200100)}
           </div>
           <span className="text-[11px] text-emerald-800 font-semibold flex items-center gap-1 pt-1">
-            <Sparkles className="h-3 w-3 text-emerald-600" />
             0% Downpayment Ready
           </span>
         </div>
       </div>
 
       {/* Holdings List & Collateral Table */}
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <h2 className="font-display font-bold text-lg text-slate-900">

@@ -108,20 +108,16 @@ export default function ProductGallery({ imageUrl, images = [], alt }) {
         <div
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="relative aspect-square w-full overflow-hidden rounded-3xl border border-slate-200/90 bg-gradient-to-b from-white via-slate-50 to-slate-100/70 p-6 sm:p-10 shadow-card flex items-center justify-center cursor-crosshair group"
+          className="relative aspect-square w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 sm:p-10 shadow-sm flex items-center justify-center cursor-crosshair group"
         >
-          {/* Subtle Ambient Light Glow */}
-          <div className="absolute inset-0 bg-radial-light opacity-60 pointer-events-none" />
-
           {/* Top Stage Badges */}
           <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2">
-            <span className="flex items-center gap-1 rounded-full border border-indigo-200 bg-white/95 px-3 py-1 text-[11px] font-bold text-indigo-700 shadow-sm backdrop-blur-md">
-              <Sparkles className="h-3 w-3 text-indigo-600" />
-              100% Genuine Sealed
+            <span className="flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700">
+              Brand Certified Sealed
             </span>
-            <span className="flex items-center gap-1 rounded-full border border-emerald-200 bg-white/95 px-3 py-1 text-[11px] font-bold text-emerald-700 shadow-sm backdrop-blur-md">
+            <span className="flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-800">
               <Shield className="h-3 w-3 text-emerald-600" />
-              1Fi Verified Lien
+              1Fi Lien Eligible
             </span>
           </div>
 
@@ -131,7 +127,7 @@ export default function ProductGallery({ imageUrl, images = [], alt }) {
               src={activeUrl || fallback}
               alt={alt || currentItem?.label || 'Product showcase'}
               style={zoomStyle}
-              className={`max-h-[90%] max-w-[90%] object-contain drop-shadow-2xl transition-transform duration-300 ${
+              className={`max-h-[90%] max-w-[90%] object-contain drop-shadow-md transition-transform duration-200 ${
                 currentItem?.transform && !zoomStyle.transform ? currentItem.transform : ''
               }`}
               onError={(e) => {
@@ -142,33 +138,33 @@ export default function ProductGallery({ imageUrl, images = [], alt }) {
 
           {/* Bottom Floating Photo Angle Label */}
           <div className="absolute bottom-4 left-4 z-20">
-            <span className="rounded-full bg-white/90 border border-slate-200/90 px-3 py-1 text-[11px] font-semibold text-slate-700 shadow-sm backdrop-blur-md">
+            <span className="rounded-md bg-white border border-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-700 shadow-sm">
               {currentItem?.label || 'Front & Back View'}
             </span>
           </div>
 
           {/* Bottom Right Rating Pill */}
-          <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 rounded-full bg-white/90 border border-slate-200/90 px-3 py-1 text-xs font-bold text-slate-800 shadow-sm backdrop-blur-md">
+          <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 rounded-md bg-white border border-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-800 shadow-sm">
             <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
             <span>4.9</span>
             <span className="text-slate-400 font-normal text-[10px]">(500+ reviews)</span>
           </div>
 
           {/* Device Floor Shadow */}
-          <div className="absolute bottom-6 h-6 w-3/4 rounded-full bg-slate-400/20 blur-xl pointer-events-none z-0" />
+          <div className="absolute bottom-6 h-6 w-3/4 rounded-full bg-slate-300/30 blur-xl pointer-events-none z-0" />
         </div>
 
         {/* Value Highlights under the photo (Snapmint / E-commerce style) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] text-slate-600 pt-1">
-          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm">
+          <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-2.5 shadow-sm">
             <Truck className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
-            <span className="truncate">Free Express Insured Delivery</span>
+            <span className="truncate">Free Insured Express Delivery</span>
           </div>
-          <div className="flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50/70 p-2.5 text-emerald-800 shadow-sm">
-            <Sparkles className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+          <div className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50/70 p-2.5 text-emerald-800 shadow-sm">
+            <span className="font-bold">₹</span>
             <span className="truncate">Up to ₹11,000 Direct Cashback</span>
           </div>
-          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm col-span-2 sm:col-span-1">
+          <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-2.5 shadow-sm col-span-2 sm:col-span-1">
             <Shield className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
             <span className="truncate">1-Yr Official Brand Warranty</span>
           </div>

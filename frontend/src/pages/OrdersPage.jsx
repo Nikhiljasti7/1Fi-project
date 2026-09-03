@@ -67,7 +67,7 @@ export default function OrdersPage() {
 
         <Link
           to="/"
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:from-indigo-700 hover:to-indigo-800 transition self-start md:self-auto"
+          className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors self-start md:self-auto"
         >
           <Smartphone className="h-4 w-4" />
           <span>Shop More Flagships</span>
@@ -75,7 +75,7 @@ export default function OrdersPage() {
       </div>
 
       {notification && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800 flex items-center justify-between shadow-sm animate-in fade-in">
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800 flex items-center justify-between shadow-sm animate-in fade-in">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
             <span>{notification}</span>
@@ -93,17 +93,17 @@ export default function OrdersPage() {
       )}
 
       {!loading && orders.length === 0 && (
-        <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center shadow-sm max-w-md mx-auto space-y-4">
-          <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-slate-50 text-slate-400">
+        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm max-w-md mx-auto space-y-4">
+          <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-slate-50 text-slate-400">
             <PackageCheck className="h-6 w-6" />
           </div>
           <h3 className="font-bold text-slate-900 text-base">No active smartphone loans</h3>
-          <p className="text-xs text-slate-500">
-            You haven&apos;t placed any wealth-backed orders yet. Browse our flagships and upgrade with 0% EMI backed by your mutual funds!
+          <p className="text-xs text-slate-500 max-w-xs mx-auto">
+            Explore our curated catalog of flagships and unlock 0% EMI backed by your investment portfolio.
           </p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-md"
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-semibold text-white hover:bg-indigo-700 shadow-sm transition-colors"
           >
             <span>Explore Smartphones</span>
             <ArrowRight className="h-4 w-4" />
@@ -120,7 +120,7 @@ export default function OrdersPage() {
             return (
               <div
                 key={order.id}
-                className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6"
+                className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6"
               >
                 {/* Order Top Bar */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">

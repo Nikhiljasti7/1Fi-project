@@ -132,19 +132,22 @@ export default function PledgeCheckoutModal({ isOpen, onClose, product, variant,
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-2xl rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 text-slate-900 shadow-2xl my-8">
+      <div className="relative w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 text-slate-900 shadow-2xl my-8">
+        {/* Honeypot Bot Trap Field (Rule 12) */}
+        <input type="text" name="_trap_bot_field" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
+
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-5 right-5 grid h-8 w-8 place-items-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+          className="absolute top-5 right-5 grid h-8 w-8 place-items-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
         >
           <X className="h-4 w-4" />
         </button>
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-emerald-500 text-white font-bold shadow-md shadow-indigo-600/20">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-600 font-bold">
             <ShieldCheck className="h-5 w-5" />
           </div>
           <div>
@@ -152,7 +155,7 @@ export default function PledgeCheckoutModal({ isOpen, onClose, product, variant,
               Wealth-Backed EMI Checkout
             </h3>
             <p className="text-xs text-slate-500">
-              Pledge your investments • Zero credit card limit blocked • Keep compounding
+              Pledge your investments : Zero credit card limit blocked : Keep compounding
             </p>
           </div>
         </div>

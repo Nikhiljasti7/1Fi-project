@@ -93,18 +93,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-[85vh] flex items-center justify-center px-4 py-12 bg-slate-50 overflow-hidden">
-      {/* Soft aesthetic ambient gradients */}
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 h-80 w-[600px] rounded-full bg-gradient-to-tr from-indigo-200/40 via-purple-200/30 to-emerald-200/40 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-10 h-64 w-64 rounded-full bg-emerald-200/30 blur-2xl pointer-events-none" />
-
+    <div className="relative min-h-[85vh] flex items-center justify-center px-4 py-12 bg-[#F8F9FA]">
       <div className="relative w-full max-w-md">
         {/* Top Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-3 group">
-            <Logo className="h-11 w-11 transition-transform duration-200 group-hover:scale-105" />
+          <Link to="/" className="inline-flex items-center gap-3">
+            <Logo className="h-10 w-10" />
             <span className="font-display font-extrabold text-2xl text-slate-900 tracking-tight">
-              1Fi <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-emerald-600">Wealth</span>
+              1Fi <span className="text-indigo-600">Wealth</span>
             </span>
           </Link>
           <p className="text-xs text-slate-500 mt-2 font-medium">
@@ -113,7 +109,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card Container */}
-        <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-8 shadow-xl shadow-slate-200/50 backdrop-blur-2xl space-y-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm space-y-6">
           {error && (
             <div className="rounded-2xl border border-rose-200 bg-rose-50 p-3.5 text-xs text-rose-700 flex items-center gap-2.5">
               <AlertCircle className="h-4 w-4 shrink-0 text-rose-500" />
