@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import HomePage from './pages/HomePage.jsx';
@@ -17,26 +18,28 @@ import NotFoundPage from './pages/NotFoundPage.jsx';
 export default function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <div className="min-h-screen flex flex-col bg-[#F8F9FA] text-slate-900 font-sans selection:bg-indigo-600 selection:text-white">
-          <Navbar />
-          <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/products/:slug" element={<ProductPage />} />
-            <Route path="/wealth-backed-emi" element={<WealthEmiSimulatorPage />} />
-            <Route path="/portfolio" element={<PortfolioVaultPage />} />
-            <Route path="/compare" element={<ComparePage />} />
-            <Route path="/orders" element={<OrdersPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </AuthProvider>
-  </ErrorBoundary>
-);
+      <ThemeProvider>
+        <AuthProvider>
+          <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 font-sans selection:bg-indigo-600 selection:text-white transition-colors duration-200">
+            <Navbar />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/products/:slug" element={<ProductPage />} />
+                <Route path="/wealth-backed-emi" element={<WealthEmiSimulatorPage />} />
+                <Route path="/portfolio" element={<PortfolioVaultPage />} />
+                <Route path="/compare" element={<ComparePage />} />
+                <Route path="/orders" element={<OrdersPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
+  );
 }

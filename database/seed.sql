@@ -3,6 +3,18 @@
 
 -- ============ PRODUCTS ============
 INSERT INTO products (id, slug, name, brand, description, category) VALUES
+(100, 'iphone-17-pro-max', 'iPhone 17 Pro Max', 'Apple',
+ 'Apple''s upcoming 2nm titanium supreme flagship with 6.9-inch 120Hz display, A19 Pro chip, and triple 48MP periscope cameras.',
+ 'flagship'),
+(101, 'iphone-17-pro', 'iPhone 17 Pro', 'Apple',
+ 'Pro performance redefined in a versatile 6.3-inch titanium frame with A19 Pro, 120Hz ProMotion, and 48MP triple camera.',
+ 'flagship'),
+(102, 'iphone-17-air', 'iPhone 17 Air', 'Apple',
+ 'The revolutionary ultra-slim 5.5mm design with 6.6-inch 120Hz ProMotion display, A19 chip, and titanium-aluminium chassis.',
+ 'flagship'),
+(103, 'iphone-17', 'iPhone 17', 'Apple',
+ 'Next-gen base flagship featuring 120Hz ProMotion for the first time, A19 processor, and dual 48MP cameras.',
+ 'flagship'),
 (1, 'iphone-16-pro-max', 'iPhone 16 Pro Max', 'Apple',
  'Apple''s supreme flagship in Grade 5 Titanium with 6.9-inch display, A18 Pro chip, Camera Control button, and 4K 120 fps Dolby Vision.',
  'flagship'),
@@ -49,6 +61,29 @@ ON CONFLICT (slug) DO UPDATE SET
   category = EXCLUDED.category;
 
 -- ============ VARIANTS ============
+-- Product 100: iPhone 17 Pro Max
+INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
+(100, '256GB / Cosmic Orange', '256GB', 'Cosmic Orange', '#C96A3C', 154900, 154900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(100, '512GB / Deep Blue Titanium', '512GB', 'Deep Blue Titanium', '#1E293B', 174900, 174900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock'),
+(100, '512GB / Natural Titanium', '512GB', 'Natural Titanium', '#9E978E', 174900, 174900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-naturaltitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock'),
+(100, '1TB / Black Titanium', '1TB', 'Black Titanium', '#1F2428', 194900, 194900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-blacktitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
+
+-- Product 101: iPhone 17 Pro
+INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
+(101, '128GB / Deep Blue Titanium', '128GB', 'Deep Blue Titanium', '#1E293B', 129900, 129900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-bluetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(101, '256GB / Cosmic Orange', '256GB', 'Cosmic Orange', '#C96A3C', 139900, 139900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock'),
+(101, '512GB / Natural Titanium', '512GB', 'Natural Titanium', '#9E978E', 159900, 159900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-naturaltitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
+
+-- Product 102: iPhone 17 Air
+INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
+(102, '128GB / Sky Blue', '128GB', 'Sky Blue', '#7BA8C4', 99900, 99900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-7inch-ultramarine?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(102, '256GB / Cloud White', '256GB', 'Cloud White', '#F5F5F7', 109900, 109900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-7inch-white?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
+
+-- Product 103: iPhone 17
+INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
+(103, '128GB / Lavender', '128GB', 'Lavender', '#A89FBA', 84900, 84900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-pink?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(103, '128GB / Sage Green', '128GB', 'Sage Green', '#7B9E89', 84900, 84900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-teal?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
+
 -- Product 1: iPhone 16 Pro Max
 INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
 (1, '256GB / Desert Titanium', '256GB', 'Desert Titanium', '#C5A880', 144900, 144900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
@@ -120,6 +155,13 @@ INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling
 -- ============ EMI PLANS ============
 -- Example default plans for variants: 3, 6, 12, 24 months
 INSERT INTO emi_plans (variant_id, tenure_months, annual_interest_rate, cashback_amount, is_recommended, fund_backing_note) VALUES
+(100, 6,  0.00, 9000, false, 'Backed by Mutual Fund SIP / Stock Lien'),
+(100, 12, 0.00, 9000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(100, 24, 0.00, 9000, false, 'Backed by Mutual Fund SIP / Stock Lien'),
+(101, 12, 0.00, 8000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(101, 24, 0.00, 8000, false, 'Backed by Mutual Fund SIP / Stock Lien'),
+(102, 12, 0.00, 7000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(103, 12, 0.00, 6000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
 (1, 3,  0.00, 8000, false, 'Backed by Mutual Fund SIP / Stock Lien'),
 (1, 6,  0.00, 8000, false, 'Backed by Mutual Fund SIP / Stock Lien'),
 (1, 12, 0.00, 8000, true,  'Backed by Mutual Fund SIP / Stock Lien'),

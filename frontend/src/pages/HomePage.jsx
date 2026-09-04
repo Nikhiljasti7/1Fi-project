@@ -1,9 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { getProducts, ApiError } from '../api/client.js';
 import ProductCard from '../components/ProductCard.jsx';
 import { ProductCardSkeleton } from '../components/LoadingSkeleton.jsx';
 import ErrorState from '../components/ErrorState.jsx';
+import BackgroundPhoneTransitions from '../components/BackgroundPhoneTransitions.jsx';
+import ThreeDPhoneViewer from '../components/ThreeDPhoneViewer.jsx';
 import {
   Sparkles,
   TrendingUp,
@@ -15,15 +17,33 @@ import {
   Lock,
   ArrowLeftRight,
   Zap,
+  Box,
+  X,
+  Smartphone,
+  Eye,
 } from 'lucide-react';
 
 export default function HomePage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [state, setState] = useState({ status: 'loading', products: [], error: null });
   const [selectedBrand, setSelectedBrand] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [sortBy, setSortBy] = useState('recommended');
   const [comparedProducts, setComparedProducts] = useState([]);
+  const [show3DStudio, setShow3DStudio] = useState(false);
+
+  // Sync from URL search params on mount or when URL changes
+  useEffect(() => {
+    const q = searchParams.get('search');
+    if (q !== null && q !== searchQuery) {
+      setSearchQuery(q);
+    }
+    const b = searchParams.get('brand');
+    if (b && b !== selectedBrand) {
+      setSelectedBrand(b);
+    }
+  }, [searchParams]);
 
   const load = () => {
     setState({ status: 'loading', products: [], error: null });
@@ -53,9 +73,29 @@ export default function HomePage() {
       (p) =>
         p.name.toLowerCase().includes(q) ||
         p.brand.toLowerCase().includes(q) ||
+        p.slug.toLowerCase().includes(q) ||
+        (p.tagline && p.tagline.toLowerCase().includes(q)) ||
         (p.specs?.processor && p.specs.processor.toLowerCase().includes(q))
     );
   }, [state.products, searchQuery]);
+
+  function handleSearchChange(val) {
+    setSearchQuery(val);
+    if (val.trim()) {
+      setSearchParams({ search: val.trim() }, { replace: true });
+    } else {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('search');
+      setSearchParams(newParams, { replace: true });
+    }
+  }
+
+  function handleClearSearch() {
+    setSearchQuery('');
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('search');
+    setSearchParams(newParams, { replace: true });
+  }
 
   function handleToggleCompare(product) {
     setComparedProducts((prev) => {
@@ -77,51 +117,63 @@ export default function HomePage() {
     { id: 'samsung', label: 'Samsung' },
     { id: 'google', label: 'Google Pixel' },
     { id: 'oneplus', label: 'OnePlus' },
-    { id: 'nothing', label: 'Nothing' },
-    { id: 'xiaomi', label: 'Xiaomi' },
+  ];
+
+  const quickPills = [
+    { label: 'iPhone 17 Pro Max', query: 'iPhone 17 Pro Max' },
+    { label: 'iPhone 17 Air', query: 'iPhone 17 Air' },
+    { label: 'iPhone 17', query: 'iPhone 17' },
+    { label: 'iPhone 16 Pro', query: 'iPhone 16 Pro' },
+    { label: 'Galaxy S24 Ultra', query: 'S24 Ultra' },
+    { label: 'Pixel 9 Pro XL', query: 'Pixel 9' },
   ];
 
   return (
-    <div className="space-y-12 pb-16 bg-slate-50">
-      {/* ================= HERO SECTION ================= */}
-      <section className="relative overflow-hidden pt-12 pb-16 border-b border-slate-200/80 bg-white">
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+    <div className="space-y-12 pb-16 bg-slate-50 dark:bg-[#0B0F19] transition-colors">
+      {/* ================= HERO SECTION WITH 3D BACKGROUND TRANSITIONS ================= */}
+      <section className="relative overflow-hidden pt-12 pb-16 border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/60 transition-colors">
+        {/* Cool Floating 3D Smartphone Models & Transitions Background */}
+        <BackgroundPhoneTransitions />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center">
             {/* Top Tag */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1 text-xs font-semibold text-slate-700 shadow-sm mb-6">
-              <ShieldCheck className="h-3.5 w-3.5 text-indigo-600" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-800/90 px-3.5 py-1 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-sm mb-6 backdrop-blur-md">
+              <ShieldCheck className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
               <span>India&apos;s Regulated Wealth-Backed Smartphone Marketplace (LAMF)</span>
             </div>
 
             {/* Headline */}
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 max-w-4xl leading-tight">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl leading-tight">
               Buy Your Dream Flagship.{' '}
-              <span className="block text-indigo-600">
+              <span className="block bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-500 bg-clip-text text-transparent dark:from-indigo-400 dark:via-violet-400 dark:to-cyan-400">
                 Backed By Your Wealth.
               </span>
             </h1>
 
             {/* Subhead */}
-            <p className="mt-5 text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
-              Pledge your mutual fund folios or demat holdings at 50% LTV to unlock <strong className="text-slate-900 font-semibold">0% No-Cost EMI</strong> without liquidating your investments or blocking high credit card limits.
+            <p className="mt-5 text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+              Pledge your mutual fund folios or demat holdings at 50% LTV to unlock{' '}
+              <strong className="text-slate-900 dark:text-white font-semibold">0% No-Cost EMI</strong>{' '}
+              without liquidating your investments or blocking high credit card limits.
             </p>
 
             {/* Core Value Props */}
             <div className="mt-8 flex flex-wrap justify-center gap-3 text-xs sm:text-sm">
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-slate-700 shadow-sm">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/90 px-3.5 py-2 text-slate-700 dark:text-slate-200 shadow-sm backdrop-blur-md">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Zero Credit Card Limit Blocked</span>
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-slate-700 shadow-sm">
-                <TrendingUp className="h-4 w-4 text-indigo-600" />
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/90 px-3.5 py-2 text-slate-700 dark:text-slate-200 shadow-sm backdrop-blur-md">
+                <TrendingUp className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                 <span>Portfolio Compounding Intact (14% CAGR)</span>
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-slate-700 shadow-sm">
-                <Lock className="h-4 w-4 text-emerald-600" />
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/90 px-3.5 py-2 text-slate-700 dark:text-slate-200 shadow-sm backdrop-blur-md">
+                <Lock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Automated Depository Lien Release</span>
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-slate-700 shadow-sm">
-                <Zap className="h-4 w-4 text-indigo-600" />
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/90 px-3.5 py-2 text-slate-700 dark:text-slate-200 shadow-sm backdrop-blur-md">
+                <Zap className="h-4 w-4 text-amber-500" />
                 <span>Up to ₹11,000 Direct Cashback</span>
               </div>
             </div>
@@ -130,17 +182,26 @@ export default function HomePage() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <a
                 href="#catalog"
-                className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors"
+                className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all duration-200 hover:scale-[1.02]"
               >
-                <span>Browse Verified Flagships</span>
+                <span>Browse Flagship Lineup</span>
                 <ArrowRight className="h-4 w-4" />
               </a>
 
+              <button
+                type="button"
+                onClick={() => setShow3DStudio((prev) => !prev)}
+                className="flex items-center gap-2 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/80 dark:bg-indigo-950/60 px-5 py-3 text-sm font-bold text-indigo-700 dark:text-indigo-300 shadow-sm hover:bg-indigo-100 dark:hover:bg-indigo-900/80 transition-all backdrop-blur-md"
+              >
+                <Box className="h-4 w-4 text-amber-500" />
+                <span>{show3DStudio ? 'Hide 3D Studio' : 'Launch 3D Model Studio (360°)'}</span>
+              </button>
+
               <Link
                 to="/wealth-backed-emi"
-                className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+                className="flex items-center gap-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 px-5 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors backdrop-blur-md"
               >
-                <TrendingUp className="h-4 w-4 text-slate-500" />
+                <TrendingUp className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                 <span>Simulate Wealth Compounding</span>
               </Link>
             </div>
@@ -148,31 +209,80 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ================= 3D INTERACTIVE SMARTPHONE STUDIO (HERO EXPANSION) ================= */}
+      {show3DStudio && (
+        <section className="mx-auto max-w-5xl px-4 sm:px-6 animate-in fade-in slide-in-from-top-4 duration-300">
+          <ThreeDPhoneViewer
+            productName="iPhone 17 Pro Max (2nm A19 Pro)"
+            colorName="Cosmic Orange"
+            initialColor="#C96A3C"
+            onClose={() => setShow3DStudio(false)}
+          />
+        </section>
+      )}
+
       {/* ================= STORE CATALOG SECTION ================= */}
       <section id="catalog" className="mx-auto max-w-7xl px-4 sm:px-6 scroll-mt-24">
         {/* Controls Header */}
         <div className="mb-8 space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h2 className="font-display text-2xl font-bold text-slate-900 sm:text-3xl">
-                Explore Flagship Smartphones
-              </h2>
-              <p className="mt-1 text-xs sm:text-sm text-slate-500 font-medium">
+              <div className="flex items-center gap-2">
+                <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
+                  Explore Flagship Smartphones
+                </h2>
+                <span className="rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 px-2.5 py-0.5 text-xs font-bold text-indigo-700 dark:text-indigo-300">
+                  iPhone 17 Series Added
+                </span>
+              </div>
+              <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
                 Choose a device, select your variant, and choose a laddered EMI plan backed by your investments.
               </p>
             </div>
 
-            {/* Search Input */}
-            <div className="relative w-full md:w-72">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            {/* Search Input with Clear Button */}
+            <div className="relative w-full md:w-80">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
               <input
                 type="text"
-                placeholder="Search iPhone, Galaxy, Pixel..."
+                placeholder="Search iPhone 17, Galaxy, Pixel..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full glass-input rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 transition"
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="w-full glass-input rounded-xl pl-10 pr-9 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
+          </div>
+
+          {/* Quick Search Suggestion Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 shrink-0 mr-1">
+              Quick Find:
+            </span>
+            {quickPills.map((pill) => (
+              <button
+                key={pill.label}
+                type="button"
+                onClick={() => handleSearchChange(pill.query)}
+                className={[
+                  'rounded-lg px-2.5 py-1 text-xs font-medium transition whitespace-nowrap',
+                  searchQuery.toLowerCase() === pill.query.toLowerCase()
+                    ? 'bg-indigo-600 text-white font-bold shadow-sm'
+                    : 'border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-700',
+                ].join(' ')}
+              >
+                {pill.label}
+              </button>
+            ))}
           </div>
 
           {/* Brand Filter Tabs & Sort */}
@@ -184,10 +294,10 @@ export default function HomePage() {
                   type="button"
                   onClick={() => setSelectedBrand(b.id)}
                   className={[
-                    'px-3.5 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap',
+                    'px-3.5 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap shadow-sm',
                     selectedBrand === b.id
-                      ? 'bg-indigo-50 text-indigo-700 border border-indigo-300 shadow-sm'
-                      : 'border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50',
+                      ? 'bg-indigo-50 text-indigo-700 border border-indigo-300 dark:bg-indigo-950/70 dark:border-indigo-600 dark:text-indigo-300'
+                      : 'border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800',
                   ].join(' ')}
                 >
                   {b.label}
@@ -196,11 +306,11 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              <SlidersHorizontal className="h-3.5 w-3.5 text-slate-400" />
+              <SlidersHorizontal className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm focus:outline-none focus:border-indigo-500"
+                className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm focus:outline-none focus:border-indigo-500"
               >
                 <option value="recommended">Featured / Recommended</option>
                 <option value="price_asc">Price: Low to High</option>
@@ -210,6 +320,22 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+
+        {/* Search status notification banner */}
+        {searchQuery && (
+          <div className="mb-6 flex items-center justify-between rounded-2xl border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/60 dark:bg-indigo-950/40 px-4 py-2.5 text-xs">
+            <span className="text-slate-700 dark:text-slate-300">
+              Showing <strong className="text-indigo-700 dark:text-indigo-400 font-bold">{filteredProducts.length}</strong> smartphone{filteredProducts.length === 1 ? '' : 's'} matching &ldquo;{searchQuery}&rdquo;
+            </span>
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              Clear Filter
+            </button>
+          </div>
+        )}
 
         {/* Product Grid / States */}
         {state.status === 'loading' && (
@@ -225,17 +351,17 @@ export default function HomePage() {
         )}
 
         {state.status === 'success' && filteredProducts.length === 0 && (
-          <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center shadow-sm">
-            <p className="text-sm font-semibold text-slate-700">
-              No smartphones match your search filters.
+          <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-12 text-center shadow-sm">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              No smartphones match your search &ldquo;{searchQuery}&rdquo;.
             </p>
             <button
               type="button"
               onClick={() => {
                 setSelectedBrand('all');
-                setSearchQuery('');
+                handleClearSearch();
               }}
-              className="mt-4 rounded-xl bg-indigo-50 border border-indigo-200 px-4 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100"
+              className="mt-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 px-4 py-2 text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition"
             >
               Reset Filters
             </button>
@@ -258,46 +384,46 @@ export default function HomePage() {
 
       {/* ================= WEALTH COMPOUNDING HOW-IT-WORKS ================= */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 sm:p-12 shadow-sm">
+        <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 sm:p-12 shadow-sm transition-colors">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-800 uppercase tracking-wider">
+            <span className="rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-3 py-1 text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">
               Smart Financing
             </span>
-            <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
+            <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-2">
               Why Wealth-Backed EMI Beats Credit Cards
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 mt-2">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
               Traditional credit cards charge 14–18% p.a. and block your credit card limit. 1Fi leverages your existing investment portfolio to grant subsidized 0% EMI while your capital keeps compounding.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 space-y-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-600 font-bold">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 p-6 space-y-3">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 font-bold">
                 1
               </div>
-              <h4 className="font-bold text-slate-900 text-sm">Pledge Units Digitally</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h4 className="font-bold text-slate-900 dark:text-white text-sm">Pledge Units Digitally</h4>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 Connect your CAMS, KFintech, or Demat account via instant OTP. Pledge required units at 50% LTV without selling any holdings.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 space-y-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 font-bold">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 p-6 space-y-3">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 font-bold">
                 2
               </div>
-              <h4 className="font-bold text-slate-900 text-sm">Subsidized 0% No-Cost EMI</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h4 className="font-bold text-slate-900 dark:text-white text-sm">Subsidized 0% No-Cost EMI</h4>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 Enjoy 0% interest on short tenures and heavy cashback on longer tenures. No processing fees, zero card limit blocked.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 space-y-3">
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-50 border border-cyan-200 text-cyan-600 font-bold">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 p-6 space-y-3">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200 dark:border-cyan-800 text-cyan-600 dark:text-cyan-400 font-bold">
                 3
               </div>
-              <h4 className="font-bold text-slate-900 text-sm">Automated Lien Release</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h4 className="font-bold text-slate-900 dark:text-white text-sm">Automated Lien Release</h4>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 As your e-NACH auto-debit completes each month, the lien is progressively freed. Your mutual funds kept compounding at ~14% throughout!
               </p>
             </div>
@@ -308,7 +434,7 @@ export default function HomePage() {
       {/* ================= FLOATING COMPARE TRAY ================= */}
       {comparedProducts.length > 0 && (
         <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-4 animate-in fade-in slide-in-from-bottom-5">
-          <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-2xl backdrop-blur-2xl text-xs">
+          <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-3 shadow-2xl backdrop-blur-2xl text-xs">
             <div className="flex items-center gap-3">
               <div className="flex -space-x-2">
                 {comparedProducts.map((p) => (
@@ -316,15 +442,15 @@ export default function HomePage() {
                     key={p.id}
                     src={p.previewVariant.imageUrl}
                     alt={p.name}
-                    className="h-9 w-9 rounded-full border-2 border-white object-contain bg-slate-50 shadow-sm"
+                    className="h-9 w-9 rounded-full border-2 border-white dark:border-slate-800 object-contain bg-slate-50 dark:bg-slate-800 shadow-sm"
                   />
                 ))}
               </div>
               <div>
-                <span className="font-bold text-slate-900 block">
+                <span className="font-bold text-slate-900 dark:text-white block">
                   {comparedProducts.length} Smartphone{comparedProducts.length > 1 ? 's' : ''} Selected
                 </span>
-                <span className="text-[10px] text-slate-500">Compare specs &amp; EMI plans</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">Compare specs &amp; EMI plans</span>
               </div>
             </div>
 
@@ -332,7 +458,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={() => setComparedProducts([])}
-                className="rounded-lg px-2.5 py-1 text-slate-500 hover:text-slate-900"
+                className="rounded-lg px-2.5 py-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               >
                 Clear
               </button>
