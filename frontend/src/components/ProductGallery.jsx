@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Shield, Sparkles, Star, Truck, Check, Layers, Image as ImageIcon, Box } from 'lucide-react';
 import ThreeDPhoneViewer from './ThreeDPhoneViewer.jsx';
 
-export default function ProductGallery({ imageUrl, images = [], alt }) {
+export default function ProductGallery({ imageUrl, images = [], alt, color, colorHex }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [zoomStyle, setZoomStyle] = useState({});
   const [activeTab, setActiveTab] = useState('photos'); // 'photos' | '3d'
@@ -40,7 +40,7 @@ export default function ProductGallery({ imageUrl, images = [], alt }) {
   // Reset selected image when variant image changes
   useEffect(() => {
     setSelectedIndex(0);
-  }, [imageUrl]);
+  }, [imageUrl, images]);
 
   const currentItem = galleryList[selectedIndex] || galleryList[0];
   const activeUrl = currentItem?.url || imageUrl;
@@ -107,7 +107,12 @@ export default function ProductGallery({ imageUrl, images = [], alt }) {
       </div>
 
       {activeTab === '3d' ? (
-        <ThreeDPhoneViewer productName={alt} imageUrl={activeUrl} />
+        <ThreeDPhoneViewer
+          productName={alt}
+          imageUrl={activeUrl}
+          initialColor={colorHex || '#C96A3C'}
+          colorName={color || 'Cosmic Orange'}
+        />
       ) : (
         <div className="flex flex-col-reverse md:flex-row gap-4 items-start">
           {/* Vertical Thumbnail Column */}

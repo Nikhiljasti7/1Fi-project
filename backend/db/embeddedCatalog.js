@@ -35,22 +35,27 @@ const PRODUCTS = [
         colorHex: '#C96A3C',
         mrp: 154900,
         sellingPrice: 154900,
-        imageUrl: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+        imageUrl: '/images/iphone-17-orange/front_back.jpg',
         images: [
           {
-            angle: 'finish',
-            label: 'Cosmic Orange Titanium Finish',
-            url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+            angle: 'front_back',
+            label: 'Front & Back Titanium Finish',
+            url: '/images/iphone-17-orange/front_back.jpg',
           },
           {
-            angle: 'gallery_front',
-            label: 'Titanium Front & Narrow Dynamic Island',
-            url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-model-unselect-gallery-1-202409?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+            angle: 'camera',
+            label: 'Triple 48MP Periscope Camera Close-up',
+            url: '/images/iphone-17-orange/camera_macro.jpg',
           },
           {
-            angle: 'gallery_back',
-            label: 'Triple 48MP Periscope Array',
-            url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-model-unselect-gallery-2-202409?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+            angle: 'side',
+            label: 'Cosmic Orange Titanium Edge Profile',
+            url: '/images/iphone-17-orange/side_profile.jpg',
+          },
+          {
+            angle: 'lineup',
+            label: 'Dual Display & Finish Showcase',
+            url: '/images/iphone-17-orange/front_back_main.png',
           },
         ],
         isDefault: true,
@@ -191,12 +196,27 @@ const PRODUCTS = [
         colorHex: '#C96A3C',
         mrp: 139900,
         sellingPrice: 139900,
-        imageUrl: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+        imageUrl: '/images/iphone-17-orange/front_back.jpg',
         images: [
           {
-            angle: 'finish',
-            label: 'Cosmic Orange Finish',
-            url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+            angle: 'front_back',
+            label: 'Front & Back Titanium Finish',
+            url: '/images/iphone-17-orange/front_back.jpg',
+          },
+          {
+            angle: 'camera',
+            label: 'Triple 48MP Periscope Camera Close-up',
+            url: '/images/iphone-17-orange/camera_macro.jpg',
+          },
+          {
+            angle: 'side',
+            label: 'Cosmic Orange Titanium Edge Profile',
+            url: '/images/iphone-17-orange/side_profile.jpg',
+          },
+          {
+            angle: 'lineup',
+            label: 'Dual Display & Finish Showcase',
+            url: '/images/iphone-17-orange/front_back_main.png',
           },
         ],
         isDefault: false,
@@ -1750,4 +1770,134 @@ const PRODUCTS = [
   },
 ];
 
-module.exports = { PRODUCTS };
+const extraConfigs = {
+  'samsung-galaxy-s24-ultra': {
+    colors: [
+      { color: 'Titanium Gray', colorHex: '#7A797B' },
+      { color: 'Titanium Black', colorHex: '#2B2B2C' },
+      { color: 'Titanium Violet', colorHex: '#585065' },
+      { color: 'Titanium Yellow', colorHex: '#E5DFCE' },
+    ],
+    storages: [
+      { storage: '256GB', mrp: 134999, sellingPrice: 129999 },
+      { storage: '512GB', mrp: 144999, sellingPrice: 139999 },
+      { storage: '1TB', mrp: 164999, sellingPrice: 159999 },
+    ],
+  },
+  'google-pixel-9-pro-xl': {
+    colors: [
+      { color: 'Porcelain', colorHex: '#ECE7E1' },
+      { color: 'Obsidian', colorHex: '#2C2E30' },
+      { color: 'Hazel', colorHex: '#747C76' },
+      { color: 'Rose Quartz', colorHex: '#EEDDD8' },
+    ],
+    storages: [
+      { storage: '128GB', mrp: 114999, sellingPrice: 109999 },
+      { storage: '256GB', mrp: 129999, sellingPrice: 124999 },
+      { storage: '512GB', mrp: 144999, sellingPrice: 139999 },
+    ],
+  },
+  'oneplus-13': {
+    colors: [
+      { color: 'Midnight Black', colorHex: '#181A1B' },
+      { color: 'Arctic Dawn', colorHex: '#E4EAF0' },
+      { color: 'Emerald Green', colorHex: '#2D4B40' },
+    ],
+    storages: [
+      { storage: '256GB', mrp: 74999, sellingPrice: 69999 },
+      { storage: '512GB', mrp: 81999, sellingPrice: 76999 },
+    ],
+  },
+};
+
+function buildFullVariantMatrix(products) {
+  return products.map((product) => {
+    const extra = extraConfigs[product.slug];
+    const colorMap = new Map();
+    const storageMap = new Map();
+
+    product.variants.forEach((v) => {
+      if (v.color && !colorMap.has(v.color)) {
+        colorMap.set(v.color, {
+          color: v.color,
+          colorHex: v.colorHex,
+          imageUrl: v.imageUrl,
+          images: v.images || [],
+        });
+      }
+      if (v.storage && !storageMap.has(v.storage)) {
+        storageMap.set(v.storage, {
+          storage: v.storage,
+          mrp: v.mrp,
+          sellingPrice: v.sellingPrice,
+          emiLadder: v.emiLadder || [],
+        });
+      }
+    });
+
+    if (extra) {
+      const baseVariant = product.variants[0];
+      extra.colors.forEach((c) => {
+        if (!colorMap.has(c.color)) {
+          colorMap.set(c.color, {
+            color: c.color,
+            colorHex: c.colorHex,
+            imageUrl: baseVariant.imageUrl,
+            images: baseVariant.images || [],
+          });
+        }
+      });
+      extra.storages.forEach((s) => {
+        if (!storageMap.has(s.storage)) {
+          storageMap.set(s.storage, {
+            storage: s.storage,
+            mrp: s.mrp,
+            sellingPrice: s.sellingPrice,
+            emiLadder: baseVariant.emiLadder || [],
+          });
+        }
+      });
+    }
+
+    const allColors = Array.from(colorMap.values());
+    const allStorages = Array.from(storageMap.values());
+
+    const matrixVariants = [];
+    let counter = 1;
+
+    allColors.forEach((c, cIdx) => {
+      allStorages.forEach((s, sIdx) => {
+        const existing = product.variants.find(
+          (v) => v.color === c.color && v.storage === s.storage
+        );
+        if (existing) {
+          matrixVariants.push(existing);
+        } else {
+          matrixVariants.push({
+            id: Number('' + product.id + counter++),
+            label: `${s.storage} / ${c.color}`,
+            storage: s.storage,
+            color: c.color,
+            colorHex: c.colorHex,
+            mrp: s.mrp,
+            sellingPrice: s.sellingPrice,
+            imageUrl: c.imageUrl,
+            images: c.images,
+            isDefault: cIdx === 0 && sIdx === 0,
+            stockStatus: 'in_stock',
+            emiLadder: s.emiLadder.length > 0 ? s.emiLadder : product.variants[0].emiLadder,
+          });
+        }
+      });
+    });
+
+    return {
+      ...product,
+      variants: matrixVariants,
+    };
+  });
+}
+
+const EXPANDED_PRODUCTS = buildFullVariantMatrix(PRODUCTS);
+
+module.exports = { PRODUCTS: EXPANDED_PRODUCTS };

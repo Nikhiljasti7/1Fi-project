@@ -118,6 +118,8 @@ export default function ProductPage() {
             imageUrl={selectedVariant?.imageUrl}
             images={selectedVariant?.images}
             alt={`${product.name} - ${selectedVariant?.label}`}
+            color={selectedVariant?.color}
+            colorHex={selectedVariant?.colorHex}
           />
 
           {/* Technical Specifications Matrix */}
