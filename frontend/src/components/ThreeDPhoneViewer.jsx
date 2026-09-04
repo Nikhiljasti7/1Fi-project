@@ -1,7 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import {
   RotateCcw,
-  Maximize2,
   Sparkles,
   Layers,
   Eye,
@@ -10,459 +9,581 @@ import {
   Shield,
   Play,
   Pause,
-  Sliders,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  Check,
+  Smartphone,
+  ChevronRight,
+  Info,
 } from 'lucide-react';
 
 /**
  * ThreeDPhoneViewer
- * An interactive 3D flagship smartphone viewer with 360° rotation,
- * realistic titanium chassis, glass reflection, dynamic camera bumps,
- * finish selection, and an interactive "Exploded 3D Internal Architecture" mode!
+ * E-Commerce photorealistic 3D / 360° Smartphone Inspector (Flipkart / Amazon 3D View Style).
+ * Uses real retail studio hardware photography across multiple perspectives,
+ * smooth 360-degree rotational turntable scrubbing, specular lighting glints,
+ * interactive hardware hotspots, and finish selection.
  */
 export default function ThreeDPhoneViewer({
   productName = 'iPhone 17 Pro Max',
   brand = 'Apple',
-  initialColor = '#C96A3C', // Cosmic Orange
+  initialColor = '#C96A3C',
   colorName = 'Cosmic Orange',
-  imageUrl,
   onClose,
 }) {
-  // 3D Rotational angles
-  const [rotX, setRotX] = useState(5);
-  const [rotY, setRotY] = useState(25);
+  // Available authentic finishes with their real studio photography
+  const finishes = useMemo(
+    () => [
+      {
+        id: 'orange',
+        name: 'Cosmic Orange',
+        hex: '#C96A3C',
+        accent: '#FF7A33',
+        tag: 'New Colorway',
+        frontBack: '/images/iphone-17-orange/front_back.jpg',
+        display: '/images/iphone-17-orange/front_back_main.png',
+        camera: '/images/iphone-17-orange/camera_macro.jpg',
+        side: '/images/iphone-17-orange/side_profile.jpg',
+      },
+      {
+        id: 'blue',
+        name: 'Deep Blue Titanium',
+        hex: '#1E293B',
+        accent: '#38BDF8',
+        tag: 'Titanium Pro',
+        frontBack: '/images/iphone-17-blue/front_back.jpg',
+        display: '/images/iphone-17-blue/display_showcase.jpg',
+        camera: '/images/iphone-17-blue/camera_macro.jpg',
+        side: '/images/iphone-17-blue/side_profile.jpg',
+      },
+      {
+        id: 'natural',
+        name: 'Natural Titanium',
+        hex: '#9E978E',
+        accent: '#E2DCD5',
+        tag: 'Raw Grade 5',
+        frontBack: '/images/iphone-17-natural/front_back.jpg',
+        display: '/images/iphone-17-natural/display_showcase.jpg',
+        camera: '/images/iphone-17-natural/camera_macro.jpg',
+        side: '/images/iphone-17-natural/side_profile.jpg',
+      },
+      {
+        id: 'black',
+        name: 'Black Titanium',
+        hex: '#1F2428',
+        accent: '#6B7280',
+        tag: 'Stealth PVD',
+        frontBack: '/images/iphone-17-black/front_back.jpg',
+        display: '/images/iphone-17-black/display_showcase.jpg',
+        camera: '/images/iphone-17-black/camera_macro.jpg',
+        side: '/images/iphone-17-black/side_profile.jpg',
+      },
+      {
+        id: 'white',
+        name: 'White Titanium',
+        hex: '#F2F2F0',
+        accent: '#FFFFFF',
+        tag: 'Pure Ceramic Glass',
+        frontBack: '/images/iphone-17-white/front_back.jpg',
+        display: '/images/iphone-17-white/display_showcase.jpg',
+        camera: '/images/iphone-17-white/camera_macro.jpg',
+        side: '/images/iphone-17-white/side_profile.jpg',
+      },
+    ],
+    []
+  );
+
+  // Match initial finish by colorHex or colorName
+  const initialFinish = useMemo(() => {
+    const foundByHex = finishes.find(
+      (f) => f.hex.toLowerCase() === (initialColor || '').toLowerCase()
+    );
+    if (foundByHex) return foundByHex;
+    const foundByName = finishes.find((f) =>
+      (colorName || '').toLowerCase().includes(f.name.toLowerCase().split(' ')[0])
+    );
+    return foundByName || finishes[0];
+  }, [initialColor, colorName, finishes]);
+
+  const [currentFinish, setCurrentFinish] = useState(initialFinish);
+  const [rotY, setRotY] = useState(25); // 0 to 360 degrees
+  const [rotX, setRotX] = useState(6); // -30 to 30 degrees tilt
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragStartY, setDragStartY] = useState(0);
   const [isAutoRotating, setIsAutoRotating] = useState(true);
-  const [viewMode, setViewMode] = useState('assemble'); // 'assemble' | 'exploded' | 'front' | 'back'
-  const [selectedColor, setSelectedColor] = useState(initialColor);
-  const [selectedFinishLabel, setSelectedFinishLabel] = useState(colorName);
+  const [activeHotspot, setActiveHotspot] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1); // 1, 1.4, 1.8
+  const [viewAngleMode, setViewAngleMode] = useState('360'); // '360' | 'front' | 'camera' | 'side' | 'isometric'
 
   const containerRef = useRef(null);
 
-  // Available finishes
-  const finishes = [
-    { name: 'Cosmic Orange', hex: '#C96A3C', bezel: '#8B4219', accent: '#FF7A33' },
-    { name: 'Deep Blue Titanium', hex: '#1E293B', bezel: '#0F172A', accent: '#38BDF8' },
-    { name: 'Natural Titanium', hex: '#9E978E', bezel: '#645E56', accent: '#E2DCD5' },
-    { name: 'Black Titanium', hex: '#1C1F22', bezel: '#0B0D0E', accent: '#6B7280' },
-    { name: 'Desert Gold', hex: '#D4AF37', bezel: '#997E24', accent: '#F3E5AB' },
-  ];
-
-  const currentFinish =
-    finishes.find((f) => f.hex.toLowerCase() === selectedColor.toLowerCase()) || finishes[0];
+  // Update currentFinish if prop changes
+  useEffect(() => {
+    if (initialColor || colorName) {
+      const match =
+        finishes.find((f) => f.hex.toLowerCase() === (initialColor || '').toLowerCase()) ||
+        finishes.find((f) =>
+          (colorName || '').toLowerCase().includes(f.name.toLowerCase().split(' ')[0])
+        );
+      if (match) setCurrentFinish(match);
+    }
+  }, [initialColor, colorName, finishes]);
 
   // Auto-rotation loop
   useEffect(() => {
-    if (!isAutoRotating || isDragging || viewMode === 'exploded') return;
+    if (!isAutoRotating || isDragging || viewAngleMode !== '360') return;
     const interval = setInterval(() => {
-      setRotY((prev) => (prev + 0.75) % 360);
-    }, 25);
+      setRotY((prev) => (prev + 0.6) % 360);
+    }, 28);
     return () => clearInterval(interval);
-  }, [isAutoRotating, isDragging, viewMode]);
+  }, [isAutoRotating, isDragging, viewAngleMode]);
 
-  // Mouse drag handlers
-  function handleMouseDown(e) {
+  // Mouse & Touch Drag Handlers
+  function handlePointerDown(e) {
     setIsDragging(true);
     setIsAutoRotating(false);
-    setDragStart({ x: e.clientX, y: e.clientY });
+    setDragStartX(e.clientX || (e.touches && e.touches[0]?.clientX) || 0);
+    setDragStartY(e.clientY || (e.touches && e.touches[0]?.clientY) || 0);
   }
 
-  function handleMouseMove(e) {
+  function handlePointerMove(e) {
     if (!isDragging) return;
-    const dx = e.clientX - dragStart.x;
-    const dy = e.clientY - dragStart.y;
-    setRotY((prev) => (prev + dx * 0.65) % 360);
-    setRotX((prev) => Math.max(-60, Math.min(60, prev - dy * 0.5)));
-    setDragStart({ x: e.clientX, y: e.clientY });
+    const clientX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
+    const clientY = e.clientY || (e.touches && e.touches[0]?.clientY) || 0;
+    const dx = clientX - dragStartX;
+    const dy = clientY - dragStartY;
+
+    setRotY((prev) => (prev + dx * 0.75 + 360) % 360);
+    setRotX((prev) => Math.max(-25, Math.min(25, prev - dy * 0.4)));
+    setDragStartX(clientX);
+    setDragStartY(clientY);
   }
 
-  function handleMouseUp() {
+  function handlePointerUp() {
     setIsDragging(false);
   }
 
-  // Preset Views
-  function setPresetView(view) {
+  // Preset Angle Selection
+  function handleSelectPreset(preset) {
+    setViewAngleMode(preset);
     setIsAutoRotating(false);
-    setViewMode(view);
-    if (view === 'front') {
-      setRotX(0);
+    setActiveHotspot(null);
+    if (preset === '360') {
+      setRotY(30);
+      setRotX(6);
+      setZoomLevel(1);
+    } else if (preset === 'front') {
       setRotY(0);
-    } else if (view === 'back') {
       setRotX(0);
+      setZoomLevel(1);
+    } else if (preset === 'camera') {
       setRotY(180);
-    } else if (view === 'side') {
-      setRotX(0);
+      setRotX(4);
+      setZoomLevel(1.4);
+    } else if (preset === 'side') {
       setRotY(90);
-    } else if (view === 'isometric') {
-      setRotX(15);
-      setRotY(35);
+      setRotX(0);
+      setZoomLevel(1.2);
+    } else if (preset === 'isometric') {
+      setRotY(40);
+      setRotX(14);
+      setZoomLevel(1);
     }
   }
 
+  // Calculate which authentic retail asset to show based on rotY angle
+  // 0° - 45°: Front Display / 3D Angle
+  // 45° - 135°: Side Profile
+  // 135° - 225°: Triple 48MP Camera & Rear Glass
+  // 225° - 315°: Left Profile
+  // 315° - 360°: Front Display
+  const currentAngleInfo = useMemo(() => {
+    if (viewAngleMode === 'camera') {
+      return {
+        image: currentFinish.camera,
+        title: 'Triple 48MP Periscope Camera System',
+        badge: 'Macro Telephoto View',
+        isMacro: true,
+      };
+    }
+    if (viewAngleMode === 'side') {
+      return {
+        image: currentFinish.side,
+        title: 'Grade 5 Aerospace Titanium Edge Profile',
+        badge: 'Action Button & Camera Control',
+        isMacro: false,
+      };
+    }
+    if (viewAngleMode === 'front') {
+      return {
+        image: currentFinish.display,
+        title: 'Super Retina XDR OLED Display',
+        badge: 'Dynamic Island & Ceramic Shield',
+        isMacro: false,
+      };
+    }
+
+    // 360 degree turntable calculation
+    const norm = (rotY % 360 + 360) % 360;
+    if (norm >= 65 && norm < 115) {
+      return {
+        image: currentFinish.side,
+        title: 'Titanium Right Profile',
+        badge: 'Camera Control 2.0',
+        isMacro: false,
+      };
+    }
+    if (norm >= 115 && norm < 245) {
+      return {
+        image: currentFinish.frontBack,
+        title: 'Rear Satin-Matte Glass & 48MP System',
+        badge: 'Triple Sapphire Lenses',
+        isMacro: false,
+      };
+    }
+    if (norm >= 245 && norm < 295) {
+      return {
+        image: currentFinish.side,
+        title: 'Titanium Left Profile',
+        badge: 'Action Button & Volume Keys',
+        isMacro: false,
+      };
+    }
+    return {
+      image: currentFinish.display,
+      title: 'Front Super Retina XDR & 3D Angle',
+      badge: 'Edge-to-Edge ProMotion',
+      isMacro: false,
+    };
+  }, [viewAngleMode, rotY, currentFinish]);
+
+  // Interactive Hardware Hotspots
+  const hotspots = [
+    {
+      id: 'camera',
+      title: 'Triple 48MP Pro System',
+      desc: '48MP Fusion (ƒ/1.7) + 48MP Ultra-Wide + 48MP Periscope Telephoto with 10x optical-quality zoom & sapphire rings.',
+      icon: Camera,
+      top: '24%',
+      left: '32%',
+      angleTarget: 'camera',
+    },
+    {
+      id: 'titanium',
+      title: 'Aerospace Grade 5 Titanium',
+      desc: 'Micro-blasted satin texture with refined contoured edges. The strongest and lightest Pro chassis ever built.',
+      icon: Shield,
+      top: '52%',
+      left: '82%',
+      angleTarget: 'side',
+    },
+    {
+      id: 'display',
+      title: '6.9" Super Retina XDR',
+      desc: '1-120Hz ProMotion, narrower Dynamic Island, 2,600 nits outdoor peak brightness, 3rd-Gen Ceramic Shield.',
+      icon: Smartphone,
+      top: '38%',
+      left: '50%',
+      angleTarget: 'front',
+    },
+    {
+      id: 'processor',
+      title: 'A19 Pro Silicon (2nm)',
+      desc: 'Next-gen 2nm architecture with 6-core CPU, 6-core GPU with Neural Ray Tracing, and 32-core NPU.',
+      icon: Cpu,
+      top: '72%',
+      left: '42%',
+      angleTarget: 'isometric',
+    },
+  ];
+
   return (
-    <div className="relative w-full rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-b from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 p-4 sm:p-6 shadow-xl overflow-hidden select-none">
-      {/* Top Header Bar */}
+    <div className="relative w-full rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-b from-white via-slate-50 to-slate-100 dark:from-slate-900 dark:via-[#0E131F] dark:to-slate-950 p-4 sm:p-6 shadow-2xl overflow-hidden select-none">
+      {/* Background Studio Grid & Ambient Radial Lighting */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-40 dark:opacity-60 transition-all duration-700"
+        style={{
+          background: `radial-gradient(circle at 50% 45%, ${currentFinish.accent}20 0%, transparent 70%)`,
+        }}
+      />
+
+      {/* ================= TOP HEADER BAR ================= */}
       <div className="relative z-20 flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-200/80 dark:border-slate-800">
-        <div className="flex items-center gap-2.5">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
-            <Sparkles className="h-4 w-4" />
+        <div className="flex items-center gap-3">
+          <div
+            className="grid h-10 w-10 place-items-center rounded-2xl text-white shadow-lg transition-colors duration-300"
+            style={{ backgroundColor: currentFinish.hex === '#F2F2F0' ? '#64748B' : currentFinish.hex }}
+          >
+            <Sparkles className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
-                3D Interactive Flagship Model
+                {productName} 3D Turntable Studio
               </h3>
-              <span className="rounded-full bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/60 dark:border-emerald-800 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
-                360° Real-Time
+              <span className="rounded-full bg-indigo-50 border border-indigo-200 dark:bg-indigo-950/70 dark:border-indigo-800 px-2.5 py-0.5 text-[10px] font-extrabold text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">
+                Retail 360°
               </span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Drag to rotate device • Switch finishes • Inspect titanium chassis
+              Drag to spin 360° • Amazon/Flipkart Certified Retail Hardware • Click hotspots to inspect
             </p>
           </div>
         </div>
 
         {/* Action Controls */}
         <div className="flex items-center gap-1.5 flex-wrap">
+          {/* Auto Spin */}
           <button
             type="button"
-            onClick={() => setIsAutoRotating((prev) => !prev)}
+            onClick={() => {
+              setIsAutoRotating((prev) => !prev);
+              setViewAngleMode('360');
+            }}
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition"
           >
             {isAutoRotating ? (
               <>
                 <Pause className="h-3.5 w-3.5 text-indigo-500" />
-                <span>Pause</span>
+                <span>Pause Turntable</span>
               </>
             ) : (
               <>
                 <Play className="h-3.5 w-3.5 text-indigo-500" />
-                <span>Auto-Spin</span>
+                <span>Auto-Spin 360°</span>
               </>
             )}
           </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setViewMode((prev) => (prev === 'exploded' ? 'assemble' : 'exploded'));
-              setIsAutoRotating(false);
-              setRotX(18);
-              setRotY(40);
-            }}
-            className={[
-              'inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition shadow-sm',
-              viewMode === 'exploded'
-                ? 'bg-indigo-600 border-indigo-600 text-white'
-                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700',
-            ].join(' ')}
-          >
-            <Layers className="h-3.5 w-3.5" />
-            <span>{viewMode === 'exploded' ? 'Reassemble Phone' : 'Exploded 3D View'}</span>
-          </button>
+          {/* Zoom Buttons */}
+          <div className="inline-flex items-center rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-0.5 shadow-sm">
+            <button
+              type="button"
+              onClick={() => setZoomLevel((z) => Math.max(1, z - 0.25))}
+              disabled={zoomLevel <= 1}
+              className="p-1.5 text-slate-600 dark:text-slate-300 disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"
+              title="Zoom Out"
+            >
+              <ZoomOut className="h-3.5 w-3.5" />
+            </button>
+            <span className="px-1.5 text-[11px] font-bold text-slate-600 dark:text-slate-300 font-mono">
+              {zoomLevel.toFixed(1)}x
+            </span>
+            <button
+              type="button"
+              onClick={() => setZoomLevel((z) => Math.min(2, z + 0.25))}
+              disabled={zoomLevel >= 2}
+              className="p-1.5 text-slate-600 dark:text-slate-300 disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"
+              title="Zoom In"
+            >
+              <ZoomIn className="h-3.5 w-3.5" />
+            </button>
+          </div>
 
+          {/* Reset */}
           <button
             type="button"
-            onClick={() => setPresetView('isometric')}
-            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm"
-            title="Reset to default angle"
+            onClick={() => handleSelectPreset('360')}
+            className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm transition"
+            title="Reset 3D Turntable"
           >
             <RotateCcw className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
-      {/* Preset View Switcher Pills */}
-      <div className="relative z-20 flex items-center gap-1.5 pt-3 overflow-x-auto no-scrollbar">
-        <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 shrink-0 mr-1">
-          Camera Angles:
-        </span>
-        {[
-          { id: 'isometric', label: '3D Angle' },
-          { id: 'front', label: 'Front Display' },
-          { id: 'back', label: 'Triple Camera' },
-          { id: 'side', label: 'Titanium Edge' },
-        ].map((btn) => (
-          <button
-            key={btn.id}
-            type="button"
-            onClick={() => setPresetView(btn.id)}
-            className={[
-              'px-2.5 py-1 rounded-lg text-xs font-semibold transition shrink-0',
-              viewMode === btn.id
-                ? 'bg-indigo-50 border border-indigo-200 text-indigo-700 dark:bg-indigo-950 dark:border-indigo-800 dark:text-indigo-300'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
-            ].join(' ')}
-          >
-            {btn.label}
-          </button>
-        ))}
+      {/* ================= PRESET ANGLE PILLS ================= */}
+      <div className="relative z-20 flex items-center justify-between gap-2 pt-3 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-1">
+            Angles:
+          </span>
+          {[
+            { id: '360', label: '360° Turntable' },
+            { id: 'camera', label: 'Triple 48MP Macro' },
+            { id: 'side', label: 'Titanium Profile' },
+            { id: 'front', label: 'Front Display' },
+            { id: 'isometric', label: '45° 3D Angle' },
+          ].map((btn) => (
+            <button
+              key={btn.id}
+              type="button"
+              onClick={() => handleSelectPreset(btn.id)}
+              className={[
+                'px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0',
+                viewAngleMode === btn.id
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25 ring-2 ring-indigo-500/20'
+                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:text-slate-900 dark:hover:text-white',
+              ].join(' ')}
+            >
+              {btn.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Current Active Angle Label Badge */}
+        <div className="hidden sm:flex items-center gap-2 shrink-0">
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+            {currentAngleInfo.title}
+          </span>
+        </div>
       </div>
 
       {/* ================= 3D VIEWPORT STAGE ================= */}
       <div
         ref={containerRef}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        className="relative h-[430px] sm:h-[480px] w-full flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden my-2"
-        style={{ perspective: '1400px' }}
+        onMouseDown={handlePointerDown}
+        onMouseMove={handlePointerMove}
+        onMouseUp={handlePointerUp}
+        onMouseLeave={handlePointerUp}
+        onTouchStart={handlePointerDown}
+        onTouchMove={handlePointerMove}
+        onTouchEnd={handlePointerUp}
+        className="relative h-[440px] sm:h-[500px] w-full flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden my-3 rounded-2xl bg-slate-50/50 dark:bg-black/40 border border-slate-200/50 dark:border-slate-800/50"
       >
-        {/* Subtle radial floor spotlight */}
+        {/* Soft 3D Ground Reflection & Elliptical Shadow */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-40 dark:opacity-60"
+          className="absolute bottom-6 h-12 w-72 rounded-full blur-2xl transition-all duration-300 pointer-events-none"
           style={{
-            background: `radial-gradient(circle at 50% 55%, ${currentFinish.accent}25 0%, transparent 65%)`,
+            backgroundColor: 'rgba(0, 0, 0, 0.45)',
+            transform: `scale(${1.1 * zoomLevel})`,
           }}
         />
 
-        {/* 3D Floor Shadow */}
+        {/* Photorealistic Turntable Stage with 3D Perspective */}
         <div
-          className="absolute bottom-10 h-10 w-64 rounded-full blur-2xl transition-all duration-300 pointer-events-none"
+          className="relative flex items-center justify-center transition-transform duration-100 ease-out"
           style={{
-            backgroundColor: '#00000050',
-            transform: `scale(${1 - Math.abs(rotX) / 120}) rotateX(90deg)`,
-          }}
-        />
-
-        {/* ================= 3D SMARTPHONE MODEL ASSEMBLY ================= */}
-        <div
-          className="relative transition-transform duration-75 ease-out"
-          style={{
-            transform: `rotateX(${rotX}deg) rotateY(${rotY}deg)`,
+            transform: `scale(${zoomLevel}) perspective(1200px) rotateX(${rotX}deg) rotateY(${
+              viewAngleMode === '360' ? Math.sin((rotY * Math.PI) / 180) * 16 : 0
+            }deg)`,
             transformStyle: 'preserve-3d',
-            width: '210px',
-            height: '420px',
+            maxWidth: '380px',
+            maxHeight: '440px',
           }}
         >
-          {/* ================= LAYER 1: FRONT OLED DISPLAY ================= */}
-          <div
-            className="absolute inset-0 rounded-[44px] p-2 transition-all duration-500"
-            style={{
-              transform: viewMode === 'exploded' ? 'translateZ(90px)' : 'translateZ(10px)',
-              transformStyle: 'preserve-3d',
-              backgroundColor: currentFinish.bezel,
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), inset 0 0 0 1.5px rgba(255,255,255,0.2)',
-            }}
-          >
-            {/* Front Glass Bezel */}
-            <div className="relative h-full w-full rounded-[36px] bg-slate-950 p-3 flex flex-col justify-between overflow-hidden border border-black/80">
-              {/* Dynamic Island Pill */}
-              <div className="relative z-30 mx-auto h-5 w-24 rounded-full bg-black border border-white/10 flex items-center justify-between px-2.5 shadow-md">
-                <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[8px] font-bold text-emerald-400">0% EMI</span>
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                </div>
-              </div>
+          {/* Main Photorealistic Retail Hardware Render */}
+          <div className="relative rounded-3xl overflow-hidden p-2">
+            <img
+              src={currentAngleInfo.image}
+              alt={`${productName} in ${currentFinish.name} - ${currentAngleInfo.title}`}
+              className={`max-h-[380px] sm:max-h-[420px] w-auto object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.35)] transition-all duration-300 pointer-events-none select-none ${
+                currentAngleInfo.isMacro ? 'scale-110' : ''
+              }`}
+            />
 
-              {/* Screen Wallpaper / UI Interface */}
-              <div className="relative z-20 space-y-3 mt-4">
-                <div className="rounded-2xl border border-white/20 bg-white/10 p-3 backdrop-blur-md text-white shadow-lg">
-                  <div className="flex items-center justify-between text-[10px] text-slate-300">
-                    <span className="uppercase font-bold tracking-wider text-emerald-300">1Fi Wealth LAMF</span>
-                    <span>14% CAGR</span>
-                  </div>
-                  <div className="mt-1.5 text-sm font-extrabold">{productName}</div>
-                  <div className="text-[11px] text-slate-300 mt-0.5">
-                    Finish: <strong className="text-white">{selectedFinishLabel}</strong>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-white/15 bg-black/40 p-2.5 backdrop-blur-md space-y-1.5">
-                  <div className="flex justify-between text-[10px] text-slate-300">
-                    <span>Monthly EMI:</span>
-                    <span className="font-bold text-emerald-400">Zero Interest</span>
-                  </div>
-                  <div className="flex justify-between text-[10px] text-slate-300">
-                    <span>SEBI Pledged LTV:</span>
-                    <span className="font-bold text-white">50% Available</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Screen Glass Glare reflection */}
-              <div className="absolute -inset-full bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none transform -rotate-45" />
-
-              {/* Home indicator bar */}
-              <div className="relative z-30 mx-auto h-1.5 w-28 rounded-full bg-white/60 mb-1" />
-            </div>
-          </div>
-
-          {/* ================= LAYER 2 (EXPLODED ONLY): A19 PRO CHIP & MOTHERBOARD ================= */}
-          {viewMode === 'exploded' && (
+            {/* Specular Light Sweep / Luxury Reflection Glint */}
             <div
-              className="absolute inset-4 rounded-3xl p-3 border border-emerald-500/40 bg-slate-950/90 text-white shadow-2xl backdrop-blur-md transition-all duration-500 flex flex-col justify-between"
+              className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-35 dark:opacity-50 transition-all duration-100"
               style={{
-                transform: 'translateZ(30px)',
-                transformStyle: 'preserve-3d',
+                background: `linear-gradient(${rotY + 45}deg, transparent 35%, rgba(255,255,255,0.7) 50%, transparent 65%)`,
               }}
+            />
+          </div>
+
+          {/* ================= INTERACTIVE HOTSPOT MARKERS ================= */}
+          {hotspots.map((spot) => (
+            <div
+              key={spot.id}
+              className="absolute z-30 transition-all duration-300"
+              style={{ top: spot.top, left: spot.left }}
             >
-              <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                <div className="flex items-center gap-1.5 text-emerald-400">
-                  <Cpu className="h-4 w-4" />
-                  <span className="text-[11px] font-bold">Apple A19 Pro Logic Board</span>
-                </div>
-                <span className="text-[9px] font-mono text-slate-400">2nm FinFET</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-[9px] my-auto">
-                <div className="p-2 rounded-xl bg-white/5 border border-white/10">
-                  <div className="text-slate-400">CPU Cores</div>
-                  <div className="font-bold text-white text-xs">6-Core Architecture</div>
-                </div>
-                <div className="p-2 rounded-xl bg-white/5 border border-white/10">
-                  <div className="text-slate-400">Neural Engine</div>
-                  <div className="font-bold text-white text-xs">32 Cores NPU</div>
-                </div>
-                <div className="p-2 rounded-xl bg-white/5 border border-white/10">
-                  <div className="text-slate-400">Ray Tracing</div>
-                  <div className="font-bold text-emerald-400 text-xs">Hardware Gen-2</div>
-                </div>
-                <div className="p-2 rounded-xl bg-white/5 border border-white/10">
-                  <div className="text-slate-400">Sub-display ID</div>
-                  <div className="font-bold text-white text-xs">Face ID TrueDepth</div>
-                </div>
-              </div>
-
-              <div className="text-[8px] text-slate-400 text-center border-t border-white/10 pt-1.5">
-                Internal Hardware Structure • Layer 2 of 4
-              </div>
-            </div>
-          )}
-
-          {/* ================= LAYER 3: BRUSHED TITANIUM CHASSIS FRAME (SIDES) ================= */}
-          <div
-            className="absolute inset-0 rounded-[44px] transition-all duration-500"
-            style={{
-              transform: viewMode === 'exploded' ? 'translateZ(-15px)' : 'translateZ(0px)',
-              transformStyle: 'preserve-3d',
-              backgroundColor: currentFinish.hex,
-              border: `4px solid ${currentFinish.bezel}`,
-            }}
-          >
-            {/* Left Buttons (Volume & Action Button) */}
-            <div className="absolute -left-2 top-20 h-8 w-1.5 rounded-l bg-slate-600" title="Action Button" />
-            <div className="absolute -left-2 top-32 h-12 w-1.5 rounded-l bg-slate-600" title="Volume Up" />
-            <div className="absolute -left-2 top-48 h-12 w-1.5 rounded-l bg-slate-600" title="Volume Down" />
-
-            {/* Right Buttons (Side Button & Camera Control) */}
-            <div className="absolute -right-2 top-24 h-16 w-1.5 rounded-r bg-slate-600" title="Power / Siri" />
-            <div className="absolute -right-2 top-48 h-10 w-1.5 rounded-r bg-indigo-400" title="Camera Control 2.0" />
-
-            {/* Bottom Speaker grills & USB-C */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-2 w-10 rounded-t bg-slate-900 border border-slate-700" title="USB-C 10Gbps" />
-          </div>
-
-          {/* ================= LAYER 4: REAR SAPPHIRE GLASS & TRIPLE CAMERA BUMP ================= */}
-          <div
-            className="absolute inset-0 rounded-[44px] p-3 transition-all duration-500"
-            style={{
-              transform: viewMode === 'exploded' ? 'translateZ(-90px) rotateY(180deg)' : 'translateZ(-10px) rotateY(180deg)',
-              transformStyle: 'preserve-3d',
-              backgroundColor: currentFinish.hex,
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), inset 0 0 0 2px rgba(255,255,255,0.15)',
-            }}
-          >
-            {/* Satin Matte Glass Texture */}
-            <div className="relative h-full w-full rounded-[36px] flex flex-col justify-between p-4 overflow-hidden">
-              {/* Apple Logo */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-25">
-                <svg className="h-14 w-14 fill-white" viewBox="0 0 170 170">
-                  <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.04-7.67-7.89-11.95-14.54-6.3-9.8-11.16-20.9-14.57-33.3-3.42-12.4-5.13-23.75-5.13-34.05 0-14.28 3.51-26.04 10.53-35.29 7.02-9.25 15.93-14.01 26.74-14.28 4.69 0 9.87 1.25 15.54 3.76 5.66 2.5 9.4 3.82 11.22 3.94 1.58-.13 5.43-1.48 11.55-4.07 6.13-2.58 11.36-3.76 15.71-3.52 12.07.74 21.84 5.38 29.31 13.92-10.49 6.35-15.62 15.15-15.38 26.4.24 8.79 3.56 16.14 9.97 22.05 6.4 5.91 14.16 9.17 23.27 9.77-2.31 7.27-5.13 14.44-8.47 21.52zM119.22 33.72c0-7.39 2.65-14.28 7.95-20.67 5.3-6.39 11.75-10.37 19.35-11.95.24 1.13.36 2.13.36 3 0 7.39-2.73 14.36-8.2 20.92-5.46 6.55-12 10.52-19.61 11.9-.12-1.07-.18-2.14-.18-3.2z" />
-                </svg>
-              </div>
-
-              {/* Triple 48MP Camera Bump Island */}
-              <div
-                className="relative h-32 w-32 rounded-3xl p-2.5 shadow-2xl border border-white/30"
-                style={{
-                  backgroundColor: currentFinish.bezel,
-                  transform: 'translateZ(10px)',
-                  boxShadow: '0 10px 25px -5px rgba(0,0,0,0.5)',
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveHotspot(activeHotspot?.id === spot.id ? null : spot);
+                  if (spot.angleTarget) handleSelectPreset(spot.angleTarget);
                 }}
+                className={[
+                  'group relative grid h-7 w-7 place-items-center rounded-full text-white shadow-xl transition-transform hover:scale-125 focus:outline-none',
+                  activeHotspot?.id === spot.id
+                    ? 'bg-indigo-600 ring-4 ring-indigo-400/40 scale-110'
+                    : 'bg-black/80 dark:bg-white/80 text-white dark:text-black hover:bg-indigo-600 hover:text-white',
+                ].join(' ')}
+                title={spot.title}
               >
-                {/* 3 Lenses */}
-                <div className="relative h-full w-full">
-                  {/* Lens 1: Top Main 48MP */}
-                  <div className="absolute top-1 left-1 h-11 w-11 rounded-full bg-black border-2 border-slate-600 p-1.5 shadow-inner">
-                    <div className="h-full w-full rounded-full bg-slate-900 border border-indigo-400/40 flex items-center justify-center">
-                      <span className="h-2.5 w-2.5 rounded-full bg-cyan-500/80 shadow-sm" />
-                    </div>
+                <spot.icon className="h-3.5 w-3.5" />
+                <span className="absolute -inset-1 rounded-full border border-indigo-400/60 animate-ping pointer-events-none opacity-75" />
+              </button>
+
+              {/* Hotspot Popover Card */}
+              {activeHotspot?.id === spot.id && (
+                <div
+                  className="absolute z-40 top-9 -left-28 w-60 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-3.5 text-left shadow-2xl backdrop-blur-md transition-all animate-in fade-in zoom-in-95 duration-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <spot.icon className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+                      {spot.title}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setActiveHotspot(null)}
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-white text-xs font-bold"
+                    >
+                      ✕
+                    </button>
                   </div>
-
-                  {/* Lens 2: Bottom Telephoto 48MP 10x Periscope */}
-                  <div className="absolute bottom-1 left-1 h-11 w-11 rounded-full bg-black border-2 border-slate-600 p-1.5 shadow-inner">
-                    <div className="h-full w-full rounded-full bg-slate-900 border border-indigo-400/40 flex items-center justify-center">
-                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/80 shadow-sm" />
-                    </div>
-                  </div>
-
-                  {/* Lens 3: Right Ultra-Wide 48MP */}
-                  <div className="absolute top-6 right-1 h-11 w-11 rounded-full bg-black border-2 border-slate-600 p-1.5 shadow-inner">
-                    <div className="h-full w-full rounded-full bg-slate-900 border border-indigo-400/40 flex items-center justify-center">
-                      <span className="h-2.5 w-2.5 rounded-full bg-amber-500/80 shadow-sm" />
-                    </div>
-                  </div>
-
-                  {/* True Tone Flash */}
-                  <div className="absolute top-1 right-2.5 h-3.5 w-3.5 rounded-full bg-amber-100 border border-amber-300 shadow-sm" />
-
-                  {/* LiDAR Scanner */}
-                  <div className="absolute bottom-2 right-2.5 h-3 w-3 rounded-full bg-black border border-slate-700" />
+                  <p className="mt-2 text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+                    {spot.desc}
+                  </p>
                 </div>
-              </div>
-
-              {/* Bottom text */}
-              <div className="text-[10px] font-bold text-white/70 text-center">
-                Titanium Pro Chassis • 48MP Pro System
-              </div>
+              )}
             </div>
-          </div>
+          ))}
         </div>
 
-        {/* Drag Guidance Helper */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 pointer-events-none flex items-center gap-1.5 rounded-full bg-black/60 dark:bg-slate-800/80 px-3 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
-          <Eye className="h-3 w-3 text-indigo-400" />
-          <span>Click &amp; drag mouse horizontally or vertically to spin in 3D</span>
+        {/* Drag Helper Guidance Pill */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 pointer-events-none flex items-center gap-2 rounded-full bg-black/75 dark:bg-slate-900/90 px-4 py-1.5 text-[11px] font-semibold text-white shadow-lg backdrop-blur-md border border-white/10">
+          <Eye className="h-3.5 w-3.5 text-indigo-400" />
+          <span>Click &amp; drag horizontally to scrub 360° turntable</span>
+          <span className="text-[10px] text-indigo-300 font-mono">
+            ({Math.round(rotY)}°)
+          </span>
         </div>
       </div>
 
-      {/* ================= BOTTOM FINISH & COLOR SELECTOR ================= */}
+      {/* ================= BOTTOM FINISH / COLOR SELECTOR ================= */}
       <div className="relative z-20 pt-4 border-t border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-            Select 3D Finish:
+            Certified Finish:
           </span>
-          <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
-            {selectedFinishLabel}
+          <span className="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
+            {currentFinish.name}
+          </span>
+          <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:text-slate-400">
+            {currentFinish.tag}
           </span>
         </div>
 
+        {/* Color Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
           {finishes.map((f) => {
-            const isSel = f.hex.toLowerCase() === selectedColor.toLowerCase();
+            const isSel = f.id === currentFinish.id;
             return (
               <button
-                key={f.name}
+                key={f.id}
                 type="button"
-                onClick={() => {
-                  setSelectedColor(f.hex);
-                  setSelectedFinishLabel(f.name);
-                }}
+                onClick={() => setCurrentFinish(f)}
                 className={[
-                  'flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition shadow-sm',
+                  'flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-bold transition shadow-sm',
                   isSel
-                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:border-indigo-500 dark:text-indigo-300 ring-1 ring-indigo-500'
-                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300',
+                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/80 dark:border-indigo-500 dark:text-indigo-300 ring-2 ring-indigo-500/30'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-400',
                 ].join(' ')}
               >
                 <span
-                  className="h-3.5 w-3.5 rounded-full border border-black/20 shadow-sm"
+                  className="h-3.5 w-3.5 rounded-full border border-black/25 shadow-inner"
                   style={{ backgroundColor: f.hex }}
                 />
                 <span>{f.name}</span>
+                {isSel && <Check className="h-3 w-3 text-indigo-600 dark:text-indigo-400" />}
               </button>
             );
           })}

@@ -145,32 +145,32 @@ export default function HomePage() {
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center">
-            {/* Top Tag */}
+            {/* 1Fi Company Brand Tag */}
             <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 px-4 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-sm mb-6 backdrop-blur-md">
               <ShieldCheck className="h-3.5 w-3.5 text-indigo-600 dark:text-[#0070d5]" />
-              <span>India&apos;s Regulated Wealth-Backed Smartphone Marketplace (LAMF)</span>
+              <span>1Fi • India&apos;s Regulated Wealth-Backed Smartphone Marketplace (LAMF)</span>
             </div>
 
-            {/* Headline */}
+            {/* 1Fi Primary Corporate Headline */}
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl leading-tight">
-              Buy Your Dream Flagship.{' '}
+              1Fi Wealth-Backed Financing.{' '}
               <span className="block text-indigo-600 dark:text-[#0070d5]">
-                Backed By Your Wealth.
+                Own Your Dream Flagship. Keep Your Wealth Compounding.
               </span>
             </h1>
 
-            {/* Subhead */}
+            {/* 1Fi Company Mission Subhead */}
             <p className="mt-5 text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-              Pledge your mutual fund folios or demat holdings at 50% LTV to unlock{' '}
-              <strong className="text-slate-900 dark:text-white font-semibold">0% No-Cost EMI</strong>{' '}
-              without liquidating your investments or blocking high credit card limits.
+              <strong className="text-slate-900 dark:text-white font-semibold">1Fi Financial Services</strong> enables you to pledge mutual fund folios (CAMS &amp; KFintech) or demat holdings at 50% LTV to unlock{' '}
+              <strong className="text-indigo-600 dark:text-[#0070d5] font-semibold">0% No-Cost EMI</strong>{' '}
+              without liquidating investments or exhausting credit card limits.
             </p>
 
             {/* Core Value Props */}
             <div className="mt-8 flex flex-wrap justify-center gap-3 text-xs sm:text-sm">
               <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/90 px-4 py-2.5 text-slate-700 dark:text-slate-200 shadow-sm backdrop-blur-md">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <span>Zero Credit Card Limit Blocked</span>
+                <span>1Fi Zero Credit Limit Block</span>
               </div>
               <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/90 px-4 py-2.5 text-slate-700 dark:text-slate-200 shadow-sm backdrop-blur-md">
                 <TrendingUp className="h-4 w-4 text-indigo-600 dark:text-[#0070d5]" />
@@ -178,11 +178,11 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/90 px-4 py-2.5 text-slate-700 dark:text-slate-200 shadow-sm backdrop-blur-md">
                 <Lock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <span>Automated Depository Lien Release</span>
+                <span>Automated CAMS/KFintech Lien Release</span>
               </div>
               <div className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/90 px-4 py-2.5 text-slate-700 dark:text-slate-200 shadow-sm backdrop-blur-md">
                 <Zap className="h-4 w-4 text-amber-500" />
-                <span>Up to ₹11,000 Direct Cashback</span>
+                <span>Up to ₹11,000 Direct 1Fi Cashback</span>
               </div>
             </div>
 
@@ -192,7 +192,7 @@ export default function HomePage() {
                 href="#catalog"
                 className="flex items-center gap-2 rounded-xl bg-indigo-600 dark:bg-[#0070d5] px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-indigo-700 dark:hover:bg-[#005fb8] transition-colors"
               >
-                <span>Browse Verified Flagships</span>
+                <span>Browse 1Fi Flagship Catalog</span>
                 <ArrowRight className="h-4 w-4" />
               </a>
 
@@ -202,7 +202,7 @@ export default function HomePage() {
                 className="flex items-center gap-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 px-5 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition"
               >
                 <Box className="h-4 w-4 text-indigo-600 dark:text-[#0070d5]" />
-                <span>{show3DStudio ? 'Close 3D Studio' : 'Launch 3D Studio (360°)'}</span>
+                <span>{show3DStudio ? 'Close 1Fi 3D Studio' : '1Fi 3D Turntable Studio (360°)'}</span>
               </button>
 
               <Link
@@ -210,7 +210,7 @@ export default function HomePage() {
                 className="flex items-center gap-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 px-5 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition"
               >
                 <TrendingUp className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-                <span>Simulate Wealth Compounding</span>
+                <span>1Fi Wealth Compounding Calculator</span>
               </Link>
             </div>
           </div>
@@ -237,14 +237,14 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
-                  Explore Flagship Smartphones
+                  1Fi Flagship Smartphone Catalog
                 </h2>
                 <span className="rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 px-2.5 py-0.5 text-xs font-bold text-indigo-700 dark:text-indigo-300">
-                  iPhone 17 Added
+                  iPhone 17 All Finishes Added
                 </span>
               </div>
               <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
-                Choose a device, select your variant, and choose a laddered EMI plan backed by your investments.
+                Pledge mutual funds or equity at 50% LTV to purchase authentic smartphones with 0% No-Cost EMI.
               </p>
             </div>
 

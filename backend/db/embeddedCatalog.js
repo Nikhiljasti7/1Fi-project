@@ -75,12 +75,27 @@ const PRODUCTS = [
         colorHex: '#1E293B',
         mrp: 174900,
         sellingPrice: 174900,
-        imageUrl: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+        imageUrl: '/images/iphone-17-blue/front_back.jpg',
         images: [
           {
-            angle: 'finish',
-            label: 'Deep Blue Titanium Finish',
-            url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+            angle: 'front_back',
+            label: 'Front & Back Deep Blue Finish',
+            url: '/images/iphone-17-blue/front_back.jpg',
+          },
+          {
+            angle: 'camera',
+            label: 'Triple 48MP Sapphire Camera Array',
+            url: '/images/iphone-17-blue/camera_macro.jpg',
+          },
+          {
+            angle: 'side',
+            label: 'Deep Blue Titanium Edge Profile',
+            url: '/images/iphone-17-blue/side_profile.jpg',
+          },
+          {
+            angle: 'display',
+            label: '3D Dynamic Display & Island',
+            url: '/images/iphone-17-blue/display_showcase.jpg',
           },
         ],
         isDefault: false,
@@ -98,12 +113,27 @@ const PRODUCTS = [
         colorHex: '#9E978E',
         mrp: 174900,
         sellingPrice: 174900,
-        imageUrl: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-naturaltitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+        imageUrl: '/images/iphone-17-natural/front_back.jpg',
         images: [
           {
-            angle: 'finish',
-            label: 'Natural Titanium Finish',
-            url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-naturaltitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+            angle: 'front_back',
+            label: 'Front & Back Natural Titanium Finish',
+            url: '/images/iphone-17-natural/front_back.jpg',
+          },
+          {
+            angle: 'camera',
+            label: 'Triple 48MP Titanium Camera Array',
+            url: '/images/iphone-17-natural/camera_macro.jpg',
+          },
+          {
+            angle: 'side',
+            label: 'Natural Titanium Edge Profile',
+            url: '/images/iphone-17-natural/side_profile.jpg',
+          },
+          {
+            angle: 'display',
+            label: '3D Dynamic Display & Island',
+            url: '/images/iphone-17-natural/display_showcase.jpg',
           },
         ],
         isDefault: false,
@@ -121,12 +151,27 @@ const PRODUCTS = [
         colorHex: '#1F2428',
         mrp: 194900,
         sellingPrice: 194900,
-        imageUrl: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-blacktitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+        imageUrl: '/images/iphone-17-black/front_back.jpg',
         images: [
           {
-            angle: 'finish',
-            label: 'Black Titanium Finish',
-            url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-blacktitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+            angle: 'front_back',
+            label: 'Front & Back Black Titanium Finish',
+            url: '/images/iphone-17-black/front_back.jpg',
+          },
+          {
+            angle: 'camera',
+            label: 'Triple 48MP Stealth Black Camera',
+            url: '/images/iphone-17-black/camera_macro.jpg',
+          },
+          {
+            angle: 'side',
+            label: 'Black Titanium Edge Profile',
+            url: '/images/iphone-17-black/side_profile.jpg',
+          },
+          {
+            angle: 'display',
+            label: '3D Dynamic Display & Island',
+            url: '/images/iphone-17-black/display_showcase.jpg',
           },
         ],
         isDefault: false,
@@ -167,17 +212,27 @@ const PRODUCTS = [
         colorHex: '#1E293B',
         mrp: 129900,
         sellingPrice: 129900,
-        imageUrl: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-bluetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+        imageUrl: '/images/iphone-17-blue/front_back.jpg',
         images: [
           {
-            angle: 'finish',
-            label: 'Deep Blue Titanium Finish',
-            url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-bluetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+            angle: 'front_back',
+            label: 'Front & Back Deep Blue Finish',
+            url: '/images/iphone-17-blue/front_back.jpg',
           },
           {
-            angle: 'gallery_front',
-            label: 'Front & Display View',
-            url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-model-unselect-gallery-1-202409?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+            angle: 'camera',
+            label: 'Triple 48MP Sapphire Camera Array',
+            url: '/images/iphone-17-blue/camera_macro.jpg',
+          },
+          {
+            angle: 'side',
+            label: 'Deep Blue Titanium Edge Profile',
+            url: '/images/iphone-17-blue/side_profile.jpg',
+          },
+          {
+            angle: 'display',
+            label: '3D Dynamic Display & Island',
+            url: '/images/iphone-17-blue/display_showcase.jpg',
           },
         ],
         isDefault: true,
@@ -234,12 +289,27 @@ const PRODUCTS = [
         colorHex: '#9E978E',
         mrp: 159900,
         sellingPrice: 159900,
-        imageUrl: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-naturaltitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+        imageUrl: '/images/iphone-17-natural/front_back.jpg',
         images: [
           {
-            angle: 'finish',
-            label: 'Natural Titanium Finish',
-            url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-naturaltitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+            angle: 'front_back',
+            label: 'Front & Back Natural Titanium Finish',
+            url: '/images/iphone-17-natural/front_back.jpg',
+          },
+          {
+            angle: 'camera',
+            label: 'Triple 48MP Titanium Camera Array',
+            url: '/images/iphone-17-natural/camera_macro.jpg',
+          },
+          {
+            angle: 'side',
+            label: 'Natural Titanium Edge Profile',
+            url: '/images/iphone-17-natural/side_profile.jpg',
+          },
+          {
+            angle: 'display',
+            label: '3D Dynamic Display & Island',
+            url: '/images/iphone-17-natural/display_showcase.jpg',
           },
         ],
         isDefault: false,
@@ -257,12 +327,27 @@ const PRODUCTS = [
         colorHex: '#F2F2F0',
         mrp: 179900,
         sellingPrice: 179900,
-        imageUrl: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-whitetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+        imageUrl: '/images/iphone-17-white/front_back.jpg',
         images: [
           {
-            angle: 'finish',
-            label: 'White Titanium Finish',
-            url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-whitetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+            angle: 'front_back',
+            label: 'Front & Back White Titanium Finish',
+            url: '/images/iphone-17-white/front_back.jpg',
+          },
+          {
+            angle: 'camera',
+            label: 'Triple 48MP White Studio Camera',
+            url: '/images/iphone-17-white/camera_macro.jpg',
+          },
+          {
+            angle: 'side',
+            label: 'White Titanium Edge Profile',
+            url: '/images/iphone-17-white/side_profile.jpg',
+          },
+          {
+            angle: 'display',
+            label: '3D Dynamic Display & Island',
+            url: '/images/iphone-17-white/display_showcase.jpg',
           },
         ],
         isDefault: false,
@@ -1810,6 +1895,159 @@ const extraConfigs = {
   },
 };
 
+const AUTHENTIC_COLOR_SETS = {
+  'Cosmic Orange': {
+    imageUrl: '/images/iphone-17-orange/front_back.jpg',
+    images: [
+      {
+        angle: 'front_back',
+        label: 'Front & Back Titanium Finish',
+        url: '/images/iphone-17-orange/front_back.jpg',
+      },
+      {
+        angle: 'camera',
+        label: 'Triple 48MP Periscope Camera Close-up',
+        url: '/images/iphone-17-orange/camera_macro.jpg',
+      },
+      {
+        angle: 'side',
+        label: 'Cosmic Orange Titanium Edge Profile',
+        url: '/images/iphone-17-orange/side_profile.jpg',
+      },
+      {
+        angle: 'lineup',
+        label: 'Dual Display & Finish Showcase',
+        url: '/images/iphone-17-orange/front_back_main.png',
+      },
+    ],
+  },
+  'Deep Blue Titanium': {
+    imageUrl: '/images/iphone-17-blue/front_back.jpg',
+    images: [
+      {
+        angle: 'front_back',
+        label: 'Front & Back Deep Blue Finish',
+        url: '/images/iphone-17-blue/front_back.jpg',
+      },
+      {
+        angle: 'camera',
+        label: 'Triple 48MP Sapphire Camera Array',
+        url: '/images/iphone-17-blue/camera_macro.jpg',
+      },
+      {
+        angle: 'side',
+        label: 'Deep Blue Titanium Edge Profile',
+        url: '/images/iphone-17-blue/side_profile.jpg',
+      },
+      {
+        angle: 'display',
+        label: '3D Dynamic Display & Island',
+        url: '/images/iphone-17-blue/display_showcase.jpg',
+      },
+    ],
+  },
+  'Natural Titanium': {
+    imageUrl: '/images/iphone-17-natural/front_back.jpg',
+    images: [
+      {
+        angle: 'front_back',
+        label: 'Front & Back Natural Titanium Finish',
+        url: '/images/iphone-17-natural/front_back.jpg',
+      },
+      {
+        angle: 'camera',
+        label: 'Triple 48MP Titanium Camera Array',
+        url: '/images/iphone-17-natural/camera_macro.jpg',
+      },
+      {
+        angle: 'side',
+        label: 'Natural Titanium Edge Profile',
+        url: '/images/iphone-17-natural/side_profile.jpg',
+      },
+      {
+        angle: 'display',
+        label: '3D Dynamic Display & Island',
+        url: '/images/iphone-17-natural/display_showcase.jpg',
+      },
+    ],
+  },
+  'Black Titanium': {
+    imageUrl: '/images/iphone-17-black/front_back.jpg',
+    images: [
+      {
+        angle: 'front_back',
+        label: 'Front & Back Black Titanium Finish',
+        url: '/images/iphone-17-black/front_back.jpg',
+      },
+      {
+        angle: 'camera',
+        label: 'Triple 48MP Stealth Black Camera',
+        url: '/images/iphone-17-black/camera_macro.jpg',
+      },
+      {
+        angle: 'side',
+        label: 'Black Titanium Edge Profile',
+        url: '/images/iphone-17-black/side_profile.jpg',
+      },
+      {
+        angle: 'display',
+        label: '3D Dynamic Display & Island',
+        url: '/images/iphone-17-black/display_showcase.jpg',
+      },
+    ],
+  },
+  'White Titanium': {
+    imageUrl: '/images/iphone-17-white/front_back.jpg',
+    images: [
+      {
+        angle: 'front_back',
+        label: 'Front & Back White Titanium Finish',
+        url: '/images/iphone-17-white/front_back.jpg',
+      },
+      {
+        angle: 'camera',
+        label: 'Triple 48MP White Studio Camera',
+        url: '/images/iphone-17-white/camera_macro.jpg',
+      },
+      {
+        angle: 'side',
+        label: 'White Titanium Edge Profile',
+        url: '/images/iphone-17-white/side_profile.jpg',
+      },
+      {
+        angle: 'display',
+        label: '3D Dynamic Display & Island',
+        url: '/images/iphone-17-white/display_showcase.jpg',
+      },
+    ],
+  },
+  'Desert Titanium': {
+    imageUrl: '/images/iphone-17-orange/front_back.jpg',
+    images: [
+      {
+        angle: 'front_back',
+        label: 'Front & Back Desert Titanium Finish',
+        url: '/images/iphone-17-orange/front_back.jpg',
+      },
+      {
+        angle: 'camera',
+        label: 'Triple 48MP Periscope Camera Close-up',
+        url: '/images/iphone-17-orange/camera_macro.jpg',
+      },
+      {
+        angle: 'side',
+        label: 'Desert Titanium Edge Profile',
+        url: '/images/iphone-17-orange/side_profile.jpg',
+      },
+      {
+        angle: 'display',
+        label: '3D Dynamic Display & Island',
+        url: '/images/iphone-17-orange/front_back_main.png',
+      },
+    ],
+  },
+};
+
 function buildFullVariantMatrix(products) {
   return products.map((product) => {
     const extra = extraConfigs[product.slug];
@@ -1817,12 +2055,13 @@ function buildFullVariantMatrix(products) {
     const storageMap = new Map();
 
     product.variants.forEach((v) => {
+      const authSet = AUTHENTIC_COLOR_SETS[v.color];
       if (v.color && !colorMap.has(v.color)) {
         colorMap.set(v.color, {
           color: v.color,
           colorHex: v.colorHex,
-          imageUrl: v.imageUrl,
-          images: v.images || [],
+          imageUrl: authSet ? authSet.imageUrl : v.imageUrl,
+          images: authSet ? authSet.images : (v.images || []),
         });
       }
       if (v.storage && !storageMap.has(v.storage)) {
@@ -1838,12 +2077,13 @@ function buildFullVariantMatrix(products) {
     if (extra) {
       const baseVariant = product.variants[0];
       extra.colors.forEach((c) => {
+        const authSet = AUTHENTIC_COLOR_SETS[c.color];
         if (!colorMap.has(c.color)) {
           colorMap.set(c.color, {
             color: c.color,
             colorHex: c.colorHex,
-            imageUrl: baseVariant.imageUrl,
-            images: baseVariant.images || [],
+            imageUrl: authSet ? authSet.imageUrl : baseVariant.imageUrl,
+            images: authSet ? authSet.images : (baseVariant.images || []),
           });
         }
       });
@@ -1866,12 +2106,20 @@ function buildFullVariantMatrix(products) {
     let counter = 1;
 
     allColors.forEach((c, cIdx) => {
+      const authSet = AUTHENTIC_COLOR_SETS[c.color];
+      const finalImageUrl = authSet ? authSet.imageUrl : c.imageUrl;
+      const finalImages = authSet ? authSet.images : (c.images && c.images.length > 0 ? c.images : []);
+
       allStorages.forEach((s, sIdx) => {
         const existing = product.variants.find(
           (v) => v.color === c.color && v.storage === s.storage
         );
         if (existing) {
-          matrixVariants.push(existing);
+          matrixVariants.push({
+            ...existing,
+            imageUrl: authSet ? authSet.imageUrl : existing.imageUrl,
+            images: authSet ? authSet.images : (existing.images?.length ? existing.images : finalImages),
+          });
         } else {
           matrixVariants.push({
             id: Number('' + product.id + counter++),
@@ -1881,8 +2129,8 @@ function buildFullVariantMatrix(products) {
             colorHex: c.colorHex,
             mrp: s.mrp,
             sellingPrice: s.sellingPrice,
-            imageUrl: c.imageUrl,
-            images: c.images,
+            imageUrl: finalImageUrl,
+            images: finalImages,
             isDefault: cIdx === 0 && sIdx === 0,
             stockStatus: 'in_stock',
             emiLadder: s.emiLadder.length > 0 ? s.emiLadder : product.variants[0].emiLadder,
