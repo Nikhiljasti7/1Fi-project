@@ -41,7 +41,7 @@ export default function ProductGallery({ imageUrl, images = [], alt }) {
 
   const currentItem = galleryList[selectedIndex] || galleryList[0];
   const activeUrl = currentItem?.url || imageUrl;
-  const fallback = 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=1000&q=85';
+  const fallback = 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90';
 
   function handleMouseMove(e) {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();

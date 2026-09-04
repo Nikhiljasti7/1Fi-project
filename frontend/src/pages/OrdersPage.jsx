@@ -125,7 +125,7 @@ export default function OrdersPage() {
             const sellingPrice = order.product?.sellingPrice || 144900;
             const imageUrl =
               order.product?.imageUrl ||
-              'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=800&q=80';
+              'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90';
 
             const monthlyPayment = order.plan?.monthlyPayment || Math.round(sellingPrice / totalEmis);
             const interestRate = order.plan?.annualInterestRate ?? 0;
@@ -179,7 +179,7 @@ export default function OrdersPage() {
                       className="h-20 w-20 rounded-xl object-contain bg-slate-50 p-2 border border-slate-100 shadow-sm shrink-0"
                       onError={(e) => {
                         e.currentTarget.src =
-                          'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=800&q=80';
+                          'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90';
                       }}
                     />
                     <div>

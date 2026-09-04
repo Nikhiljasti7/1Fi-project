@@ -162,7 +162,7 @@ let activeOrders = [
       brand: 'Apple',
       variantLabel: '256GB / Desert Titanium',
       sellingPrice: 144900,
-      imageUrl: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1000&q=85',
+      imageUrl: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
     },
     plan: {
       tenureMonths: 12,

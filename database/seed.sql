@@ -2,118 +2,139 @@
 -- Run AFTER schema.sql on a clean database.
 
 -- ============ PRODUCTS ============
-INSERT INTO products (slug, name, brand, description, category) VALUES
-('iphone-17-pro', 'iPhone 17 Pro', 'Apple',
- 'Apple''s flagship Pro smartphone with titanium frame, A19 Pro chip, 48MP triple camera system and ceramic shield.',
+INSERT INTO products (id, slug, name, brand, description, category) VALUES
+(1, 'iphone-16-pro-max', 'iPhone 16 Pro Max', 'Apple',
+ 'Apple''s supreme flagship in Grade 5 Titanium with 6.9-inch display, A18 Pro chip, Camera Control button, and 4K 120 fps Dolby Vision.',
  'flagship'),
-('iphone-16-pro-max', 'iPhone 16 Pro Max', 'Apple',
- 'The ultimate iPhone with expansive 6.9-inch display, A18 Pro silicon, Camera Control button, and 4K 120 fps Dolby Vision.',
+(2, 'iphone-16-pro', 'iPhone 16 Pro', 'Apple',
+ 'Pro performance in a versatile 6.3-inch titanium design with A18 Pro, 48MP triple camera system, and 5x Telephoto optical zoom.',
  'flagship'),
-('iphone-16', 'iPhone 16', 'Apple',
- 'Vibrant color-infused back glass, Action button, dual 48MP Fusion camera with macro photography, and blazing fast A18 chip.',
+(3, 'iphone-16-plus', 'iPhone 16 Plus', 'Apple',
+ 'Expansive 6.7-inch Super Retina XDR screen, A18 chip, Camera Control, and up to 27 hours video battery life.',
  'flagship'),
-('samsung-galaxy-s24-ultra', 'Samsung Galaxy S24 Ultra', 'Samsung',
+(4, 'iphone-16', 'iPhone 16', 'Apple',
+ 'Colour-infused glass back with A18 chip, Camera Control button, and 48MP Fusion camera with 2x Telephoto optical quality.',
+ 'flagship'),
+(5, 'iphone-16e', 'iPhone 16e', 'Apple',
+ 'The newest Apple Intelligence powerhouse built for everyone with 6.1-inch OLED, A18 processor, and 48MP 2-in-1 camera.',
+ 'flagship'),
+(6, 'iphone-15-pro-max', 'iPhone 15 Pro Max', 'Apple',
+ 'Titanium powerhouse with 3nm A17 Pro silicon, customizable Action button, and 5x tetraprism optical telephoto zoom.',
+ 'flagship'),
+(7, 'iphone-15-pro', 'iPhone 15 Pro', 'Apple',
+ 'Grade 5 Titanium design with 6.1-inch 120Hz ProMotion screen, A17 Pro processor, and versatile 48MP camera.',
+ 'flagship'),
+(8, 'iphone-15-plus', 'iPhone 15 Plus', 'Apple',
+ 'Large 6.7-inch screen with all-day battery life, Dynamic Island, 48MP Main camera, and USB-C connectivity.',
+ 'flagship'),
+(9, 'iphone-15', 'iPhone 15', 'Apple',
+ 'Dynamic Island, 48MP Main camera with 2x zoom, durable colour-infused back glass, and universal USB-C charging.',
+ 'flagship'),
+(10, 'iphone-se-3rd-gen', 'iPhone SE (3rd Gen)', 'Apple',
+ 'Iconic compact pocket design with 4.7-inch display, fast A15 Bionic chip, 5G speeds, and Home button with Touch ID.',
+ 'flagship'),
+(11, 'samsung-galaxy-s24-ultra', 'Samsung Galaxy S24 Ultra', 'Samsung',
  'Samsung''s crowning Galaxy flagship with titanium frame, built-in S Pen, Galaxy AI suite, and 200MP Quad Tele camera.',
  'flagship'),
-('samsung-galaxy-z-fold-6', 'Samsung Galaxy Z Fold 6', 'Samsung',
- 'Slimmer, lighter, and more durable dual-screen folding powerhouse with S Pen fold edition support and Snapdragon 8 Gen 3.',
- 'foldable'),
-('google-pixel-9-pro-xl', 'Google Pixel 9 Pro XL', 'Google',
+(12, 'google-pixel-9-pro-xl', 'Google Pixel 9 Pro XL', 'Google',
  'Engineered by Google with Gemini Nano, Super Actua display, Google Tensor G4 chip, and 50MP triple computational cameras.',
  'flagship'),
-('oneplus-13', 'OnePlus 13', 'OnePlus',
+(13, 'oneplus-13', 'OnePlus 13', 'OnePlus',
  'OnePlus flagship with Snapdragon 8 Elite, 2K Oriental display, Hasselblad-tuned cameras, and 6000mAh battery with 100W SUPERVOOC.',
- 'flagship'),
-('oneplus-open', 'OnePlus Open', 'OnePlus',
- 'Lightweight folding flagship with Hasselblad cameras, dual ProXDR 120Hz displays, and Open Canvas multi-window multitasking.',
- 'foldable'),
-('nothing-phone-2', 'Nothing Phone (2)', 'Nothing',
- 'Iconic transparent glass back with customizable LED Glyph lighting, Snapdragon 8+ Gen 1, and clean bloatware-free Nothing OS.',
- 'flagship'),
-('xiaomi-14-ultra', 'Xiaomi 14 Ultra', 'Xiaomi',
- 'Leica Summilux all-focal length quad camera setup with custom 1-inch sensor, stepless variable aperture, and Snapdragon 8 Gen 3.',
- 'flagship');
+ 'flagship')
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name,
+  brand = EXCLUDED.brand,
+  description = EXCLUDED.description,
+  category = EXCLUDED.category;
 
 -- ============ VARIANTS ============
--- Product 1: iPhone 17 Pro
+-- Product 1: iPhone 16 Pro Max
 INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
-(1, '256GB / Deep Blue', '256GB', 'Deep Blue', '#1E293B', 134900, 127400, 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1000&q=85', true, 'in_stock'),
-(1, '256GB / Cosmic Orange', '256GB', 'Cosmic Orange', '#C96A3C', 134900, 129900, 'https://images.unsplash.com/photo-1695048132966-4b6c30f0e02b?auto=format&fit=crop&w=1000&q=85', false, 'in_stock'),
-(1, '512GB / Natural Titanium', '512GB', 'Natural Titanium', '#9E978E', 154900, 147400, 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=1000&q=85', false, 'in_stock');
+(1, '256GB / Desert Titanium', '256GB', 'Desert Titanium', '#C5A880', 144900, 144900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(1, '512GB / Natural Titanium', '512GB', 'Natural Titanium', '#9E978E', 164900, 164900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-naturaltitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock'),
+(1, '512GB / White Titanium', '512GB', 'White Titanium', '#F2F2F0', 164900, 164900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-whitetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock'),
+(1, '1TB / Black Titanium', '1TB', 'Black Titanium', '#3B3A36', 184900, 184900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-blacktitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
 
--- Product 2: iPhone 16 Pro Max
+-- Product 2: iPhone 16 Pro
 INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
-(2, '256GB / Desert Titanium', '256GB', 'Desert Titanium', '#C5A992', 144900, 139900, 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=1000&q=85', true, 'in_stock'),
-(2, '512GB / Black Titanium', '512GB', 'Black Titanium', '#1F2428', 164900, 159900, 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1000&q=85', false, 'in_stock');
+(2, '128GB / Desert Titanium', '128GB', 'Desert Titanium', '#C5A880', 119900, 119900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(2, '256GB / Natural Titanium', '256GB', 'Natural Titanium', '#9E978E', 129900, 129900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-naturaltitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock'),
+(2, '512GB / White Titanium', '512GB', 'White Titanium', '#F2F2F0', 149900, 149900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-whitetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock'),
+(2, '1TB / Black Titanium', '1TB', 'Black Titanium', '#3B3A36', 169900, 169900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-blacktitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
 
--- Product 3: iPhone 16
+-- Product 3: iPhone 16 Plus
 INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
-(3, '128GB / Ultramarine', '128GB', 'Ultramarine', '#3B60E4', 79900, 74900, 'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?auto=format&fit=crop&w=1000&q=85', true, 'in_stock'),
-(3, '256GB / Teal', '256GB', 'Teal', '#4E938A', 89900, 84900, 'https://images.unsplash.com/photo-1575695342320-d2d2d2f9b73f?auto=format&fit=crop&w=1000&q=85', false, 'in_stock');
+(3, '128GB / Ultramarine', '128GB', 'Ultramarine', '#44658A', 89900, 89900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-7inch-ultramarine?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(3, '256GB / Teal', '256GB', 'Teal', '#7AA39E', 99900, 99900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-7inch-teal?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock'),
+(3, '256GB / Pink', '256GB', 'Pink', '#E297A7', 99900, 99900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-7inch-pink?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
 
--- Product 4: Samsung Galaxy S24 Ultra
+-- Product 4: iPhone 16
 INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
-(4, '256GB / Titanium Black', '256GB', 'Titanium Black', '#1B1B1D', 129999, 114999, 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=1000&q=85', true, 'in_stock'),
-(4, '256GB / Titanium Gray', '256GB', 'Titanium Gray', '#8A8D8F', 129999, 116999, 'https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=1000&q=85', false, 'in_stock'),
-(4, '512GB / Titanium Violet', '512GB', 'Titanium Violet', '#4E445B', 144999, 129999, 'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=1000&q=85', false, 'in_stock');
+(4, '128GB / Ultramarine', '128GB', 'Ultramarine', '#44658A', 79900, 79900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-ultramarine?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(4, '128GB / Teal', '128GB', 'Teal', '#7AA39E', 79900, 79900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-teal?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock'),
+(4, '256GB / Pink', '256GB', 'Pink', '#E297A7', 89900, 89900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-pink?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
 
--- Product 5: Samsung Galaxy Z Fold 6
+-- Product 5: iPhone 16e
 INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
-(5, '256GB / Silver Shadow', '256GB', 'Silver Shadow', '#A3A8AF', 164999, 154999, 'https://images.unsplash.com/photo-1584006682522-dc17d6c0d963?auto=format&fit=crop&w=1000&q=85', true, 'in_stock'),
-(5, '512GB / Navy', '512GB', 'Navy', '#1E2C3E', 176999, 166999, 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=1000&q=85', false, 'in_stock');
+(5, '128GB / White', '128GB', 'White', '#F2F4F5', 59900, 59900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16e-finish-select-202502-white?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(5, '256GB / Black', '256GB', 'Black', '#252627', 69900, 69900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16e-finish-select-202502-black?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
 
--- Product 6: Google Pixel 9 Pro XL
+-- Product 6: iPhone 15 Pro Max
 INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
-(6, '256GB / Obsidian', '256GB', 'Obsidian', '#202124', 124999, 114999, 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=1000&q=85', true, 'in_stock'),
-(6, '256GB / Porcelain', '256GB', 'Porcelain', '#F1EFE9', 124999, 114999, 'https://images.unsplash.com/photo-1585060544812-6b45742d762f?auto=format&fit=crop&w=1000&q=85', false, 'in_stock'),
-(6, '512GB / Hazel', '512GB', 'Hazel', '#58615A', 139999, 129999, 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=1000&q=85', false, 'in_stock');
+(6, '256GB / Natural Titanium', '256GB', 'Natural Titanium', '#9E978E', 149900, 134900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-naturaltitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(6, '256GB / Blue Titanium', '256GB', 'Blue Titanium', '#3A4450', 149900, 134900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-bluetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
 
--- Product 7: OnePlus 13
+-- Product 7: iPhone 15 Pro
 INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
-(7, '256GB / Midnight Ocean', '256GB', 'Midnight Ocean', '#1E2A38', 69999, 64999, 'https://images.unsplash.com/photo-1592286927505-1def25115df3?auto=format&fit=crop&w=1000&q=85', true, 'in_stock'),
-(7, '256GB / Arctic Dawn', '256GB', 'Arctic Dawn', '#E7E4DD', 69999, 65999, 'https://images.unsplash.com/photo-1567581935884-3349723552ca?auto=format&fit=crop&w=1000&q=85', false, 'in_stock');
+(7, '128GB / Natural Titanium', '128GB', 'Natural Titanium', '#9E978E', 129900, 109900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-naturaltitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(7, '256GB / Blue Titanium', '256GB', 'Blue Titanium', '#3A4450', 139900, 119900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-1inch-bluetitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
 
--- Product 8: OnePlus Open
+-- Product 8: iPhone 15 Plus
 INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
-(8, '512GB / Emerald Dusk', '512GB', 'Emerald Dusk', '#254E41', 149999, 139999, 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=1000&q=85', true, 'in_stock');
+(8, '128GB / Blue', '128GB', 'Blue', '#D4E0E8', 79900, 69900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-finish-select-202309-6-7inch-blue?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(8, '128GB / Pink', '128GB', 'Pink', '#F6D2D6', 79900, 69900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-finish-select-202309-6-7inch-pink?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
 
--- Product 9: Nothing Phone (2)
+-- Product 9: iPhone 15
 INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
-(9, '256GB / Dark Gray', '256GB', 'Dark Gray', '#2D3139', 49999, 37999, 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=1000&q=85', true, 'in_stock');
+(9, '128GB / Blue', '128GB', 'Blue', '#D4E0E8', 69900, 59900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-blue?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(9, '128GB / Pink', '128GB', 'Pink', '#F6D2D6', 69900, 59900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-finish-select-202309-6-1inch-pink?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
 
--- Product 10: Xiaomi 14 Ultra
+-- Product 10: iPhone SE (3rd Gen)
 INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
-(10, '512GB / Black Leather', '512GB', 'Black Leather', '#18181B', 119999, 99999, 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1000&q=85', true, 'in_stock');
+(10, '64GB / Midnight', '64GB', 'Midnight', '#1B242F', 47900, 43900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-se-finish-select-202207-midnight?wid=1000&hei=1000&fmt=jpeg&qlt=90', true, 'in_stock'),
+(10, '128GB / Starlight', '128GB', 'Starlight', '#F9F6EF', 52900, 48900, 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-se-finish-select-202207-starlight?wid=1000&hei=1000&fmt=jpeg&qlt=90', false, 'in_stock');
+
+-- Product 11: Samsung Galaxy S24 Ultra
+INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
+(11, '256GB / Titanium Gray', '256GB', 'Titanium Gray', '#6B7280', 134999, 129999, 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?auto=format&fit=crop&w=1000&q=85', true, 'in_stock');
+
+-- Product 12: Google Pixel 9 Pro XL
+INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
+(12, '256GB / Porcelain', '256GB', 'Porcelain', '#ECE7E1', 124999, 124999, 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=1000&q=85', true, 'in_stock');
+
+-- Product 13: OnePlus 13
+INSERT INTO variants (product_id, label, storage, color, color_hex, mrp, selling_price, image_url, is_default, stock_status) VALUES
+(13, '256GB / Midnight Black', '256GB', 'Midnight Black', '#181A1B', 69999, 69999, 'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=1000&q=85', true, 'in_stock');
 
 -- ============ EMI PLANS ============
--- Comprehensive plans for variants: 3, 6, 12, 24, 36 months
+-- Example default plans for variants: 3, 6, 12, 24 months
 INSERT INTO emi_plans (variant_id, tenure_months, annual_interest_rate, cashback_amount, is_recommended, fund_backing_note) VALUES
--- Variant 1 (iPhone 17 Pro 256GB)
-(1, 3,  0.00, 7500, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-(1, 6,  0.00, 7500, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-(1, 12, 0.00, 7500, true,  'Backed by Mutual Fund SIP / Stock Pledge'),
-(1, 24, 0.00, 7500, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-(1, 36, 10.50, 7500, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-
--- Variant 4 (iPhone 16 Pro Max 256GB)
-(4, 3,  0.00, 8000, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-(4, 6,  0.00, 8000, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-(4, 12, 0.00, 8000, true,  'Backed by Mutual Fund SIP / Stock Pledge'),
-(4, 24, 0.00, 8000, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-(4, 36, 10.50, 8000, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-
--- Variant 8 (Galaxy S24 Ultra 256GB)
-(8, 3,  0.00, 6000, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-(8, 6,  0.00, 6000, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-(8, 12, 0.00, 6000, true,  'Backed by Mutual Fund SIP / Stock Pledge'),
-(8, 24, 0.00, 6000, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-
--- Variant 13 (Google Pixel 9 Pro XL)
-(13, 6,  0.00, 6000, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-(13, 12, 0.00, 6000, true,  'Backed by Mutual Fund SIP / Stock Pledge'),
-(13, 24, 0.00, 6000, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-
--- Variant 16 (OnePlus 13)
-(16, 6,  0.00, 3000, false, 'Backed by Mutual Fund SIP / Stock Pledge'),
-(16, 12, 0.00, 3000, true,  'Backed by Mutual Fund SIP / Stock Pledge'),
-(16, 24, 0.00, 3000, false, 'Backed by Mutual Fund SIP / Stock Pledge');
+(1, 3,  0.00, 8000, false, 'Backed by Mutual Fund SIP / Stock Lien'),
+(1, 6,  0.00, 8000, false, 'Backed by Mutual Fund SIP / Stock Lien'),
+(1, 12, 0.00, 8000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(1, 24, 0.00, 8000, false, 'Backed by Mutual Fund SIP / Stock Lien'),
+(2, 6,  0.00, 7000, false, 'Backed by Mutual Fund SIP / Stock Lien'),
+(2, 12, 0.00, 7000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(2, 24, 0.00, 7000, false, 'Backed by Mutual Fund SIP / Stock Lien'),
+(3, 12, 0.00, 6000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(4, 12, 0.00, 5000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(5, 12, 0.00, 4000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(6, 12, 0.00, 7000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(7, 12, 0.00, 6000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(8, 12, 0.00, 5000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(9, 12, 0.00, 4000, true,  'Backed by Mutual Fund SIP / Stock Lien'),
+(10, 12, 0.00, 3000, true, 'Backed by Mutual Fund SIP / Stock Lien'),
+(11, 12, 0.00, 7500, true, 'Backed by Mutual Fund SIP / Stock Lien'),
+(12, 12, 0.00, 7000, true, 'Backed by Mutual Fund SIP / Stock Lien'),
+(13, 12, 0.00, 4000, true, 'Backed by Mutual Fund SIP / Stock Lien');

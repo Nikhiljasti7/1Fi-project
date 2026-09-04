@@ -35,7 +35,7 @@ export default function ProductCard({ product, onToggleCompare, isCompared }) {
           className="h-full w-full object-contain drop-shadow-sm"
           onError={(e) => {
             e.currentTarget.src =
-              'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=800&q=80';
+              'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90';
           }}
         />
       </Link>
