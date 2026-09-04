@@ -4,7 +4,6 @@ import { getProducts, ApiError } from '../api/client.js';
 import ProductCard from '../components/ProductCard.jsx';
 import { ProductCardSkeleton } from '../components/LoadingSkeleton.jsx';
 import ErrorState from '../components/ErrorState.jsx';
-import ThreeDPhoneViewer from '../components/ThreeDPhoneViewer.jsx';
 import {
   TrendingUp,
   ShieldCheck,
@@ -27,7 +26,6 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [sortBy, setSortBy] = useState('recommended');
   const [comparedProducts, setComparedProducts] = useState([]);
-  const [show3DStudio, setShow3DStudio] = useState(false);
 
   // Sync from URL search params
   useEffect(() => {
@@ -196,15 +194,6 @@ export default function HomePage() {
                 <ArrowRight className="h-4 w-4" />
               </a>
 
-              <button
-                type="button"
-                onClick={() => setShow3DStudio((prev) => !prev)}
-                className="flex items-center gap-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 px-5 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-              >
-                <Box className="h-4 w-4 text-indigo-600 dark:text-[#0070d5]" />
-                <span>{show3DStudio ? 'Close 1Fi 3D Studio' : '1Fi 3D Turntable Studio (360°)'}</span>
-              </button>
-
               <Link
                 to="/wealth-backed-emi"
                 className="flex items-center gap-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 px-5 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition"
@@ -216,18 +205,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ================= 3D INTERACTIVE SMARTPHONE STUDIO MODAL / EXPANSION ================= */}
-      {show3DStudio && (
-        <section className="mx-auto max-w-5xl px-4 sm:px-6 animate-in fade-in duration-200">
-          <ThreeDPhoneViewer
-            productName="iPhone 17 Pro Max (2nm A19 Pro)"
-            colorName="Cosmic Orange"
-            initialColor="#C96A3C"
-            onClose={() => setShow3DStudio(false)}
-          />
-        </section>
-      )}
 
       {/* ================= STORE CATALOG SECTION ================= */}
       <section id="catalog" className="mx-auto max-w-7xl px-4 sm:px-6 scroll-mt-24">

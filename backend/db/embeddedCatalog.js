@@ -2022,27 +2022,27 @@ const AUTHENTIC_COLOR_SETS = {
     ],
   },
   'Desert Titanium': {
-    imageUrl: '/images/iphone-17-orange/front_back.jpg',
+    imageUrl: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
     images: [
       {
-        angle: 'front_back',
-        label: 'Front & Back Desert Titanium Finish',
-        url: '/images/iphone-17-orange/front_back.jpg',
+        angle: 'finish',
+        label: 'Desert Titanium Finish',
+        url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=1000&hei=1000&fmt=jpeg&qlt=90',
       },
       {
-        angle: 'camera',
-        label: 'Triple 48MP Periscope Camera Close-up',
-        url: '/images/iphone-17-orange/camera_macro.jpg',
+        angle: 'gallery_front',
+        label: 'Titanium Front & Display Profile',
+        url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-model-unselect-gallery-1-202409?wid=1000&hei=1000&fmt=jpeg&qlt=90',
+      },
+      {
+        angle: 'gallery_back',
+        label: 'Grade 5 Back & Triple Camera Island',
+        url: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-model-unselect-gallery-2-202409?wid=1000&hei=1000&fmt=jpeg&qlt=90',
       },
       {
         angle: 'side',
         label: 'Desert Titanium Edge Profile',
-        url: '/images/iphone-17-orange/side_profile.jpg',
-      },
-      {
-        angle: 'display',
-        label: '3D Dynamic Display & Island',
-        url: '/images/iphone-17-orange/front_back_main.png',
+        url: 'https://m.media-amazon.com/images/I/61bK6PMOC3L._SX679_.jpg',
       },
     ],
   },
