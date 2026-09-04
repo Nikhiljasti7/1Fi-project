@@ -147,11 +147,12 @@ const APPROVED_STOCKS = [
   },
 ];
 
-// In-memory orders store
+// In-memory orders store with strict user ownership scoping
 let activeOrders = [
   {
     id: '1FI-ORD-98214',
     orderId: '1FI-ORD-98214',
+    userId: 'user-1',
     loanAccountNumber: '1FI-LAMF-884021',
     createdAt: new Date(Date.now() - 15 * 86400000).toISOString(),
     status: 'ACTIVE',
@@ -179,6 +180,12 @@ let activeOrders = [
       pledgedValue: 289800,
       ltvAllowed: 144900,
     },
+    customer: {
+      name: 'Nikhil Jasti',
+      pan: '•••••8912K',
+      phone: '+91 98765 43210',
+      email: 'nikhil.jasti@example.com',
+    },
     bankDetails: {
       bankName: 'HDFC Bank Ltd',
       accountMasked: '•••• 4128',
@@ -203,17 +210,26 @@ function getApprovedCollateral() {
   };
 }
 
-function getActiveOrders() {
-  return activeOrders;
+/**
+ * Returns orders strictly isolated by userId
+ */
+function getUserOrders(userId) {
+  if (!userId) return [];
+  return activeOrders.filter((o) => o.userId === userId);
 }
 
-function addOrder(orderData) {
+function getOrderById(orderId) {
+  return activeOrders.find((o) => o.id === orderId || o.orderId === orderId) || null;
+}
+
+function addOrder(orderData, userId) {
   const orderId = `1FI-ORD-${Math.floor(10000 + Math.random() * 90000)}`;
   const loanAccountNumber = `1FI-LAMF-${Math.floor(100000 + Math.random() * 900000)}`;
   const totalEmis = orderData.plan?.tenureMonths || 12;
   const newOrder = {
     id: orderId,
     orderId,
+    userId: userId || 'user-1',
     loanAccountNumber,
     createdAt: new Date().toISOString(),
     status: 'ACTIVE',
@@ -239,9 +255,15 @@ function addOrder(orderData) {
   return newOrder;
 }
 
-function prepayOrderEmi(orderId) {
+function prepayOrderEmi(orderId, userId) {
   const order = activeOrders.find((o) => o.id === orderId || o.orderId === orderId);
-  if (!order) return null;
+  if (!order) return { notFound: true };
+
+  // Strict ownership check (BOLA / IDOR defense)
+  if (userId && order.userId !== userId) {
+    return { forbidden: true };
+  }
+
   const total = order.plan?.tenureMonths || order.repaymentSchedule?.totalEmis || 12;
   const currentPaid = (order.emisPaid ?? order.repaymentSchedule?.paidEmis ?? 0) + 1;
   const newPaid = Math.min(currentPaid, total);
@@ -257,14 +279,15 @@ function prepayOrderEmi(orderId) {
     order.lienStatus = 'LIEN_RELEASED';
     order.deliveryStatus = 'LOAN_CLOSED';
   }
-  return order;
+  return { order };
 }
 
 module.exports = {
   APPROVED_MUTUAL_FUNDS,
   APPROVED_STOCKS,
   getApprovedCollateral,
-  getActiveOrders,
+  getUserOrders,
+  getOrderById,
   addOrder,
   prepayOrderEmi,
 };

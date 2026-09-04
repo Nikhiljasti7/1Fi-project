@@ -52,9 +52,17 @@ export default function LoginPage() {
     }
   }
 
-  function handleQuickDemo() {
-    demoLogin();
-    navigate('/');
+  async function handleQuickDemo() {
+    setError('');
+    setIsLoading(true);
+    try {
+      await demoLogin();
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'Demo login failed.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   async function handleSendOtp(e) {
@@ -65,7 +73,7 @@ export default function LoginPage() {
     try {
       const res = await requestPasswordReset(resetEmail);
       setSuccessMsg(res.message || 'Verification code sent to your email.');
-      if (res.demoOtp) setResetOtp(res.demoOtp);
+      if (res.devOtpHint) setResetOtp(res.devOtpHint);
       setMode('forgot_otp');
     } catch (err) {
       setError(err.message || 'Could not send verification code.');
@@ -291,13 +299,15 @@ export default function LoginPage() {
                     maxLength={6}
                     value={resetOtp}
                     onChange={(e) => setResetOtp(e.target.value)}
-                    placeholder="849201"
+                    placeholder="Enter 6-digit code"
                     className="w-full glass-input rounded-xl pl-10 pr-4 py-2.5 text-sm font-mono tracking-widest text-slate-900"
                   />
                 </div>
-                <span className="text-[10px] text-emerald-600 mt-1 block">
-                  ✓ Demo verification OTP: 849201
-                </span>
+                {resetOtp && (
+                  <span className="text-[10px] text-emerald-600 mt-1 block">
+                    ✓ Code received
+                  </span>
+                )}
               </div>
 
               <div>
@@ -309,10 +319,10 @@ export default function LoginPage() {
                   <input
                     type="password"
                     required
-                    minLength={6}
+                    minLength={8}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Minimum 6 characters"
+                    placeholder="Minimum 8 characters (bank-grade)"
                     className="w-full glass-input rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900"
                   />
                 </div>

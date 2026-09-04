@@ -1,34 +1,45 @@
 /**
- * In-memory sliding-window rate limiter.
- * Protects against brute-force password guessing, credential stuffing, and DDoS.
+ * Sliding-window rate limiter with IP spoofing defense and account-keyed brute force mitigation.
  */
-function createRateLimiter({ windowMs = 60 * 1000, max = 5, message = 'Too many requests, please try again later.' }) {
+function createRateLimiter({
+  windowMs = 60 * 1000,
+  max = 10,
+  message = 'Too many requests, please try again later.',
+  keyGenerator = null,
+}) {
   const requests = new Map();
 
   // Periodic cleanup every 2 minutes
   setInterval(() => {
     const now = Date.now();
-    for (const [ip, record] of requests.entries()) {
+    for (const [key, record] of requests.entries()) {
       if (now - record.startTime > windowMs) {
-        requests.delete(ip);
+        requests.delete(key);
       }
     }
   }, 2 * 60 * 1000).unref();
 
   return (req, res, next) => {
-    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
-    const now = Date.now();
+    let key;
+    if (keyGenerator && typeof keyGenerator === 'function') {
+      key = keyGenerator(req);
+    } else {
+      // Use req.ip (honors trust proxy configuration) or fallback to socket address
+      key = req.ip || req.socket.remoteAddress || 'unknown-client';
+    }
 
-    let record = requests.get(ip);
+    const now = Date.now();
+    let record = requests.get(key);
+
     if (!record || now - record.startTime > windowMs) {
       record = { count: 1, startTime: now };
-      requests.set(ip, record);
+      requests.set(key, record);
       return next();
     }
 
     record.count += 1;
     if (record.count > max) {
-      const retryAfterSeconds = Math.ceil((record.startTime + windowMs - now) / 1000);
+      const retryAfterSeconds = Math.max(1, Math.ceil((record.startTime + windowMs - now) / 1000));
       res.setHeader('Retry-After', retryAfterSeconds);
       return res.status(429).json({
         success: false,
@@ -44,20 +55,40 @@ function createRateLimiter({ windowMs = 60 * 1000, max = 5, message = 'Too many 
   };
 }
 
-const authLimiter = createRateLimiter({
-  windowMs: 60 * 1000, // 1 minute
-  max: 10, // 10 attempts per minute
-  message: 'Too many authentication attempts. Please wait 1 minute before trying again.',
+// Global API rate limiter (150 requests per minute per IP)
+const globalLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  max: 150,
+  message: 'API rate limit exceeded. Please slow down your requests.',
 });
 
+// Authentication rate limiter (10 attempts per minute per IP + target identity)
+const authLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: 'Too many authentication attempts. Please wait 1 minute before trying again.',
+  keyGenerator: (req) => {
+    const ip = req.ip || req.socket.remoteAddress || 'unknown';
+    const target = (req.body?.usernameOrEmail || req.body?.email || '').toLowerCase().trim();
+    return `auth:${ip}:${target}`;
+  },
+});
+
+// Financial order rate limiter (15 attempts per minute per IP/User)
 const orderLimiter = createRateLimiter({
   windowMs: 60 * 1000,
   max: 15,
   message: 'Loan submission rate limit reached. Please wait a moment before trying again.',
+  keyGenerator: (req) => {
+    const ip = req.ip || req.socket.remoteAddress || 'unknown';
+    const userId = req.user?.id || 'guest';
+    return `order:${ip}:${userId}`;
+  },
 });
 
 module.exports = {
   createRateLimiter,
+  globalLimiter,
   authLimiter,
   orderLimiter,
 };

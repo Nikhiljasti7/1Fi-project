@@ -8,15 +8,54 @@ const wealthRouter = require('./routes/wealth');
 const authRouter = require('./routes/auth');
 const securityHeaders = require('./middleware/securityHeaders');
 const { sanitizeInputMiddleware } = require('./middleware/validation');
-const { orderLimiter } = require('./middleware/rateLimiter');
+const { globalLimiter, orderLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Respect reverse proxy (e.g. Vercel, Nginx) for accurate IP resolution without blind trust
+app.set('trust proxy', 1);
+
+// Defense-in-depth middleware pipeline
 app.use(securityHeaders);
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Retry-After'],
+  })
+);
 app.use(express.json({ limit: '1mb' }));
 app.use(sanitizeInputMiddleware);
+
+// Global anti-DDoS rate limiting on all API routes
+app.use('/api', globalLimiter);
+
+// Root welcome & API overview endpoint
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    name: '1Fi Wealth-Backed EMI Backend API',
+    version: '1.0.0',
+    status: 'online',
+    documentation: 'https://github.com/Nikhiljasti7/1Fi-project#api-endpoints--example-responses',
+    endpoints: {
+      health: '/api/health',
+      products: '/api/products',
+      productDetail: '/api/products/:slug (e.g. /api/products/iphone-17-pro-max)',
+      collateral: '/api/wealth/collateral',
+      wealthCalculator: 'POST /api/wealth/calculate-offset',
+      orders: '/api/orders',
+      auth: {
+        login: 'POST /api/auth/login',
+        me: 'GET /api/auth/me',
+        forgotPassword: 'POST /api/auth/forgot-password',
+        resetPassword: 'POST /api/auth/reset-password',
+      },
+    },
+  });
+});
 
 app.get('/api/health', async (req, res) => {
   try {
@@ -56,12 +95,15 @@ app.use((req, res) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   // eslint-disable-next-line no-console
-  console.error('[error]', err);
-  res.status(err.status || 500).json({
+  console.error('[error]', err.message || err);
+  const status = err.status || 500;
+  res.status(status).json({
     success: false,
     error: {
       code: err.code || 'INTERNAL_SERVER_ERROR',
-      message: err.message || 'Something went wrong',
+      message: status === 500 && process.env.NODE_ENV === 'production'
+        ? 'An unexpected error occurred. Please try again later.'
+        : err.message || 'Something went wrong',
     },
   });
 });

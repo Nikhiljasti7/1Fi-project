@@ -1,10 +1,14 @@
 const {
   getApprovedCollateral,
-  getActiveOrders,
+  getUserOrders,
+  getOrderById,
   addOrder,
   prepayOrderEmi,
+  APPROVED_MUTUAL_FUNDS,
+  APPROVED_STOCKS,
 } = require('../db/wealthCatalog');
-const { calculateEmi } = require('../utils/emiCalculator');
+const { calculateEmi, buildEmiPlanSummary } = require('../utils/emiCalculator');
+const { PRODUCTS } = require('../db/embeddedCatalog');
 
 /**
  * GET /api/wealth/collateral
@@ -20,131 +24,262 @@ function getCollateral(req, res) {
 
 /**
  * POST /api/wealth/calculate-offset
- * Calculates wealth compounding vs EMI cost.
- * Body: { portfolioValue, expectedCagr, tenureMonths, phonePrice, annualInterestRate, cashbackAmount }
+ * Calculates wealth compounding vs EMI cost with strict input validation.
  */
 function calculateOffset(req, res) {
-  const {
-    portfolioValue = 150000,
-    expectedCagr = 14,
-    tenureMonths = 12,
-    phonePrice = 127400,
-    annualInterestRate = 0,
-    cashbackAmount = 7500,
-  } = req.body;
+  try {
+    const {
+      portfolioValue = 150000,
+      expectedCagr = 14,
+      tenureMonths = 12,
+      phonePrice = 127400,
+      annualInterestRate = 0,
+      cashbackAmount = 7500,
+    } = req.body || {};
 
-  const P = Number(phonePrice);
-  const n = Number(tenureMonths);
-  const r = Number(expectedCagr) / 100;
-  const portfolio = Number(portfolioValue);
+    const P = Number(phonePrice);
+    const n = Number(tenureMonths);
+    const cagr = Number(expectedCagr);
+    const portfolio = Number(portfolioValue);
+    const rate = Number(annualInterestRate);
+    const cashback = Number(cashbackAmount) || 0;
 
-  // Future value of the portfolio if kept untouched: FV = P * (1 + r)^(n/12)
-  const years = n / 12;
-  const portfolioFutureValue = Math.round(portfolio * Math.pow(1 + r, years));
-  const portfolioGain = portfolioFutureValue - portfolio;
+    // Strict input bounds checking (DoS and math overflow defense)
+    if (!Number.isFinite(P) || P <= 0 || P > 10000000) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_PRICE', message: 'Phone price must be a valid positive number up to ₹1,00,00,000.' },
+      });
+    }
 
-  // Opportunity cost if user had sold mutual funds to buy phone upfront:
-  // (Lost compounding on the phone amount)
-  const lostGainIfSold = Math.round(P * (Math.pow(1 + r, years) - 1));
-  const capitalGainsTaxSaved = Math.round(lostGainIfSold * 0.125); // 12.5% LTCG tax saved
+    if (!Number.isInteger(n) || n <= 0 || n > 60) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_TENURE', message: 'Tenure months must be an integer between 1 and 60.' },
+      });
+    }
 
-  // 1Fi EMI calculation
-  const emiSummary = calculateEmi({
-    principal: P,
-    tenureMonths: n,
-    annualInterestRate: Number(annualInterestRate),
-  });
+    if (!Number.isFinite(cagr) || cagr < 0 || cagr > 100) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_CAGR', message: 'Expected CAGR must be a percentage between 0% and 100%.' },
+      });
+    }
 
-  const totalPayableWithCashback = Math.max(0, emiSummary.totalPayable - Number(cashbackAmount || 0));
+    if (!Number.isFinite(portfolio) || portfolio < 0 || portfolio > 1000000000) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_PORTFOLIO', message: 'Portfolio value must be a valid positive number.' },
+      });
+    }
 
-  // Comparison: Traditional Credit Card EMI (typically 16% APR + 18% GST on interest)
-  const ccEmiSummary = calculateEmi({
-    principal: P,
-    tenureMonths: n,
-    annualInterestRate: 16,
-  });
-  const ccTotalInterest = ccEmiSummary.totalInterest * 1.18; // with GST
-  const ccTotalCost = P + ccTotalInterest;
+    if (!Number.isFinite(rate) || rate < 0 || rate > 50) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_RATE', message: 'Annual interest rate must be between 0% and 50%.' },
+      });
+    }
 
-  // Net effective phone cost with 1Fi Wealth-Backed EMI:
-  // Phone Cost - Cashback - Portfolio Gain during this period
-  // If your portfolio earned ₹24,000, that offset means you effectively paid far less!
-  const netEffectiveCost = Math.round(totalPayableWithCashback - portfolioGain);
-  const totalSavingsVsCreditCard = Math.round(ccTotalCost - totalPayableWithCashback + portfolioGain);
+    const r = cagr / 100;
+    const years = n / 12;
+    const portfolioFutureValue = Math.round(portfolio * Math.pow(1 + r, years));
+    const portfolioGain = portfolioFutureValue - portfolio;
 
-  res.json({
-    success: true,
-    data: {
-      input: {
-        portfolioValue: portfolio,
-        expectedCagr: Number(expectedCagr),
-        tenureMonths: n,
-        phonePrice: P,
-      },
-      wealthGrowth: {
-        currentPortfolioValue: portfolio,
-        projectedPortfolioValue: portfolioFutureValue,
-        estimatedWealthGain: portfolioGain,
-        lostGainIfSold,
-        capitalGainsTaxSaved,
-      },
-      emiAnalysis: {
-        oneFi: {
-          monthlyPayment: emiSummary.monthlyPayment,
-          totalPayable: emiSummary.totalPayable,
-          cashback: Number(cashbackAmount || 0),
-          netPayableAfterCashback: totalPayableWithCashback,
-          effectiveNetCostWithWealthGain: netEffectiveCost,
+    const lostGainIfSold = Math.round(P * (Math.pow(1 + r, years) - 1));
+    const capitalGainsTaxSaved = Math.round(lostGainIfSold * 0.125); // 12.5% LTCG tax saved
+
+    // 1Fi EMI calculation
+    const emiSummary = calculateEmi({
+      principal: P,
+      tenureMonths: n,
+      annualInterestRate: rate,
+    });
+
+    const totalPayableWithCashback = Math.max(0, emiSummary.totalPayable - cashback);
+
+    // Traditional Credit Card comparison (16% APR + 18% GST on interest)
+    const ccEmiSummary = calculateEmi({
+      principal: P,
+      tenureMonths: n,
+      annualInterestRate: 16,
+    });
+    const ccTotalInterest = ccEmiSummary.totalInterest * 1.18;
+    const ccTotalCost = P + ccTotalInterest;
+
+    const netEffectiveCost = Math.round(totalPayableWithCashback - portfolioGain);
+    const totalSavingsVsCreditCard = Math.round(ccTotalCost - totalPayableWithCashback + portfolioGain);
+
+    res.json({
+      success: true,
+      data: {
+        input: {
+          portfolioValue: portfolio,
+          expectedCagr: cagr,
+          tenureMonths: n,
+          phonePrice: P,
         },
-        creditCard: {
-          annualRate: 16,
-          monthlyPayment: ccEmiSummary.monthlyPayment,
-          totalInterestWithGst: Math.round(ccTotalInterest),
-          totalCost: Math.round(ccTotalCost),
+        wealthGrowth: {
+          currentPortfolioValue: portfolio,
+          projectedPortfolioValue: portfolioFutureValue,
+          estimatedWealthGain: portfolioGain,
+          lostGainIfSold,
+          capitalGainsTaxSaved,
         },
-        savings: {
-          directCashSavings: Math.round(ccTotalCost - totalPayableWithCashback),
-          totalWealthAdvantage: totalSavingsVsCreditCard,
+        emiAnalysis: {
+          oneFi: {
+            monthlyPayment: emiSummary.monthlyPayment,
+            totalPayable: emiSummary.totalPayable,
+            cashback,
+            netPayableAfterCashback: totalPayableWithCashback,
+            effectiveNetCostWithWealthGain: netEffectiveCost,
+          },
+          creditCard: {
+            annualRate: 16,
+            monthlyPayment: ccEmiSummary.monthlyPayment,
+            totalInterestWithGst: Math.round(ccTotalInterest),
+            totalCost: Math.round(ccTotalCost),
+          },
+          savings: {
+            directCashSavings: Math.round(ccTotalCost - totalPayableWithCashback),
+            totalWealthAdvantage: totalSavingsVsCreditCard,
+          },
         },
       },
-    },
-  });
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: { code: 'CALCULATION_ERROR', message: err.message || 'Unable to compute wealth offset.' },
+    });
+  }
 }
 
 /**
  * POST /api/orders
- * Places a wealth-backed order, creates virtual loan account, confirms pledge lien.
+ * Places a wealth-backed order with strict price integrity & financial anti-tampering verification.
  */
 function createOrder(req, res) {
-  const { product, plan, pledgedAsset, customer, bankDetails } = req.body;
-
-  if (!product || !plan || !pledgedAsset || !plan.tenureMonths || !plan.monthlyPayment) {
-    return res.status(400).json({
+  if (!req.user) {
+    return res.status(401).json({
       success: false,
-      error: { code: 'INVALID_ORDER_PAYLOAD', message: 'Missing or malformed product, plan, or pledged asset details.' },
+      error: { code: 'AUTH_REQUIRED', message: 'Authentication is required to book a wealth-backed EMI loan.' },
     });
   }
 
-  // Security: Mask PAN and bank account (Rule 5)
-  const rawPan = customer?.pan || 'ABCPS8912K';
+  const { product, plan, pledgedAsset, bankDetails } = req.body || {};
+
+  if (!product || !plan || !pledgedAsset || !plan.tenureMonths) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'INVALID_ORDER_PAYLOAD', message: 'Missing product, plan, or pledged asset details.' },
+    });
+  }
+
+  // 1. Authoritative Product & Variant Verification
+  const catalogProduct = PRODUCTS.find(
+    (p) => p.slug === product.slug || p.name.toLowerCase() === (product.name || '').toLowerCase()
+  );
+
+  if (!catalogProduct) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'INVALID_PRODUCT', message: 'The requested product is not available in our catalog.' },
+    });
+  }
+
+  const catalogVariant =
+    catalogProduct.variants.find(
+      (v) =>
+        v.id === product.variantId ||
+        v.label.toLowerCase() === (product.variantLabel || '').toLowerCase() ||
+        v.sellingPrice === Number(product.sellingPrice)
+    ) || catalogProduct.variants[0];
+
+  const authoritativeSellingPrice = Number(catalogVariant.sellingPrice);
+  const tenureMonths = Number(plan.tenureMonths);
+
+  if (!Number.isInteger(tenureMonths) || tenureMonths <= 0 || tenureMonths > 36) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'INVALID_TENURE', message: 'Requested EMI tenure is not supported.' },
+    });
+  }
+
+  // 2. Authoritative Plan Math Verification (Anti-Tampering)
+  const matchingLadderPlan = catalogVariant.emiLadder?.find((l) => l.tenureMonths === tenureMonths);
+  const annualInterestRate = matchingLadderPlan ? matchingLadderPlan.annualInterestRate : (Number(plan.annualInterestRate) || 0);
+  const cashbackAmount = matchingLadderPlan ? matchingLadderPlan.cashbackAmount : (Number(plan.cashbackAmount) || 0);
+
+  const serverCalculatedPlan = buildEmiPlanSummary({
+    principal: authoritativeSellingPrice,
+    tenureMonths,
+    annualInterestRate,
+    cashbackAmount,
+  });
+
+  // Check for client price manipulation
+  if (plan.monthlyPayment !== undefined) {
+    const clientMonthlyPayment = Number(plan.monthlyPayment);
+    if (Math.abs(clientMonthlyPayment - serverCalculatedPlan.monthlyPayment) > 2) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'PRICE_TAMPERING_DETECTED',
+          message: 'Financial numbers submitted differ from authoritative calculations. Fraud attempt blocked.',
+        },
+      });
+    }
+  }
+
+  // 3. Pledged Asset Validation against approved instruments
+  const assetType = pledgedAsset.type === 'STOCK' ? 'STOCK' : 'MUTUAL_FUND';
+  const approvedList = assetType === 'MUTUAL_FUND' ? APPROVED_MUTUAL_FUNDS : APPROVED_STOCKS;
+  const approvedInstrument = approvedList.find(
+    (a) => a.id === pledgedAsset.id || a.name.toLowerCase().includes((pledgedAsset.name || '').toLowerCase())
+  ) || approvedList[0];
+
+  const maxLtv = approvedInstrument.ltv || (assetType === 'MUTUAL_FUND' ? 0.50 : 0.50);
+  const requiredCollateralValue = Math.round(authoritativeSellingPrice / maxLtv);
+  const unitPrice = assetType === 'MUTUAL_FUND' ? approvedInstrument.nav : approvedInstrument.marketPrice;
+  const unitsNeeded = Math.ceil(requiredCollateralValue / unitPrice);
+
+  // 4. Secure Masked Customer details strictly bound to authenticated user
+  const user = req.user;
+  const rawPan = user.pan || 'ABCPS8912K';
   const safePan = rawPan.length >= 4 ? `•••••${rawPan.slice(-4)}` : '•••••8912K';
 
-  const order = addOrder({
-    product,
-    plan,
-    pledgedAsset,
-    customer: {
-      name: customer?.name || 'Nikhil Jasti',
-      pan: safePan,
-      phone: customer?.phone || '+91 98765 43210',
-      email: customer?.email || 'nikhil.jasti@example.com',
+  const order = addOrder(
+    {
+      product: {
+        name: catalogProduct.name,
+        brand: catalogProduct.brand,
+        variantLabel: catalogVariant.label,
+        sellingPrice: authoritativeSellingPrice,
+        mrp: Number(catalogVariant.mrp),
+        imageUrl: catalogVariant.imageUrl,
+      },
+      plan: serverCalculatedPlan,
+      pledgedAsset: {
+        type: assetType,
+        name: approvedInstrument.name,
+        unitsPledged: unitsNeeded,
+        pledgedValue: requiredCollateralValue,
+        ltvAllowed: authoritativeSellingPrice,
+      },
+      customer: {
+        name: user.name || 'Verified Investor',
+        pan: safePan,
+        phone: user.phone || '+91 98765 43210',
+        email: user.email,
+      },
+      bankDetails: {
+        bankName: bankDetails?.bankName || 'HDFC Bank Ltd',
+        accountMasked: bankDetails?.accountMasked || '•••• 4128',
+        ifsc: bankDetails?.ifsc || 'HDFC0001234',
+      },
     },
-    bankDetails: {
-      bankName: bankDetails?.bankName || 'HDFC Bank Ltd',
-      accountMasked: bankDetails?.accountMasked || '•••• 4128',
-      ifsc: bankDetails?.ifsc || 'HDFC0001234',
-    },
-  });
+    user.id
+  );
 
   res.status(201).json({
     success: true,
@@ -155,10 +290,17 @@ function createOrder(req, res) {
 
 /**
  * GET /api/orders
- * Returns all active orders and loan accounts.
+ * Returns orders strictly isolated to the authenticated user.
  */
 function listOrders(req, res) {
-  const orders = getActiveOrders();
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: { code: 'AUTH_REQUIRED', message: 'Authentication required to access loan accounts.' },
+    });
+  }
+
+  const orders = getUserOrders(req.user.id);
   res.json({
     success: true,
     count: orders.length,
@@ -168,23 +310,44 @@ function listOrders(req, res) {
 
 /**
  * POST /api/orders/:orderId/prepay
- * Simulates a prepayment of 1 month EMI.
+ * Prepares and executes a prepayment strictly checked against order ownership.
  */
 function prepayOrder(req, res) {
-  const { orderId } = req.params;
-  const updated = prepayOrderEmi(orderId);
-  if (!updated) {
-    return res.status(404).json({
+  if (!req.user) {
+    return res.status(401).json({
       success: false,
-      error: { code: 'ORDER_NOT_FOUND', message: `Order ${orderId} not found` },
+      error: { code: 'AUTH_REQUIRED', message: 'Authentication required to manage loan accounts.' },
     });
   }
+
+  const { orderId } = req.params;
+  const result = prepayOrderEmi(orderId, req.user.id);
+
+  if (result.notFound) {
+    return res.status(404).json({
+      success: false,
+      error: { code: 'ORDER_NOT_FOUND', message: `Order ${orderId} not found.` },
+    });
+  }
+
+  if (result.forbidden) {
+    return res.status(403).json({
+      success: false,
+      error: {
+        code: 'UNAUTHORIZED_LOAN_ACCESS',
+        message: 'Forbidden. You do not have permission to modify or prepay another user’s loan account.',
+      },
+    });
+  }
+
+  const updated = result.order;
   res.json({
     success: true,
     data: updated,
-    message: updated.lienStatus === 'LIEN_RELEASED'
-      ? 'All EMIs completed! Mutual fund lien has been officially released back to your portfolio.'
-      : 'EMI payment received successfully.',
+    message:
+      updated.lienStatus === 'LIEN_RELEASED'
+        ? 'All EMIs completed! Mutual fund lien has been officially released back to your portfolio.'
+        : 'EMI payment received successfully.',
   });
 }
 

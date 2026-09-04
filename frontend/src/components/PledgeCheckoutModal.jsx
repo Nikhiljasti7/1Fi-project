@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 export default function PledgeCheckoutModal({ isOpen, onClose, product, variant, plan, onOrderSuccess }) {
-  const { user } = useAuth();
+  const { user, demoLogin } = useAuth();
   const [step, setStep] = useState(1);
   const [collateralData, setCollateralData] = useState({ mutualFunds: [], stocks: [] });
   const [selectedAssetType, setSelectedAssetType] = useState('MUTUAL_FUND');
@@ -68,6 +68,17 @@ export default function PledgeCheckoutModal({ isOpen, onClose, product, variant,
     setIsSubmitting(true);
     setErrorMessage(null);
 
+    let activeUser = user;
+    if (!activeUser) {
+      try {
+        activeUser = await demoLogin();
+      } catch (authErr) {
+        setIsSubmitting(false);
+        setErrorMessage(authErr.message || 'Please sign in to confirm loan agreement and pledge securities lien.');
+        return;
+      }
+    }
+
     const payload = {
       product: {
         name: product.name,
@@ -96,10 +107,10 @@ export default function PledgeCheckoutModal({ isOpen, onClose, product, variant,
         ltvAllowed: variant.sellingPrice,
       },
       customer: {
-        name: user?.name || 'Nikhil Jasti',
-        pan: user?.pan || 'ABCPS8912K',
+        name: activeUser?.name || 'Verified Investor',
+        pan: activeUser?.pan || 'ABCPS8912K',
         phone: '+91 98765 43210',
-        email: user?.email || 'nikhil.jasti@example.com',
+        email: activeUser?.email || 'nikhil.jasti@example.com',
       },
       bankDetails: {
         bankName: 'HDFC Bank Ltd',

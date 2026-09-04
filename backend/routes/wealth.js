@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { requireAuth } = require('../middleware/authMiddleware');
 const {
   getCollateral,
   calculateOffset,
@@ -8,29 +9,30 @@ const {
   prepayOrder,
 } = require('../controllers/wealthController');
 
-// Direct & nested routes for /api/wealth and /api/orders
+// Public catalog & financial calculator endpoints
 router.get('/collateral', getCollateral);
 router.post('/calculate-offset', calculateOffset);
 
-router.get('/orders', listOrders);
-router.post('/orders', createOrder);
-router.post('/orders/:orderId/prepay', prepayOrder);
+// User-scoped secure order management
+router.get('/orders', requireAuth, listOrders);
+router.post('/orders', requireAuth, createOrder);
+router.post('/orders/:orderId/prepay', requireAuth, prepayOrder);
 
+// Aliased mount handler
 router.get('/', (req, res) => {
-  // If mounted at /api/orders, returns orders
   if (req.baseUrl.includes('orders')) {
-    return listOrders(req, res);
+    return requireAuth(req, res, () => listOrders(req, res));
   }
   return getCollateral(req, res);
 });
 
 router.post('/', (req, res) => {
   if (req.baseUrl.includes('orders')) {
-    return createOrder(req, res);
+    return requireAuth(req, res, () => createOrder(req, res));
   }
   return calculateOffset(req, res);
 });
 
-router.post('/:orderId/prepay', prepayOrder);
+router.post('/:orderId/prepay', requireAuth, prepayOrder);
 
 module.exports = router;

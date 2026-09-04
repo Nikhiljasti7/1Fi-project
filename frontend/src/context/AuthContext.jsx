@@ -1,92 +1,105 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { loginUser, forgotPasswordUser, resetPasswordUser } from '../api/client';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import {
+  loginUser,
+  forgotPasswordUser,
+  resetPasswordUser,
+  getCurrentUser,
+  getAuthToken,
+  clearAuthToken,
+} from '../api/client';
 
 const AuthContext = createContext(null);
-
-const DEFAULT_DEMO_USER = {
-  id: 'user-1',
-  username: 'nikhil',
-  name: 'Nikhil Jasti',
-  email: 'nikhil.jasti@example.com',
-  pan: 'ABCPS8912K',
-  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-  kycStatus: 'VERIFIED',
-  portfolioLimit: 340000,
-};
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('1fi_user');
-      return saved ? JSON.parse(saved) : DEFAULT_DEMO_USER;
+      const token = getAuthToken();
+      const savedUser = localStorage.getItem('1fi_user');
+      if (token && savedUser) {
+        return JSON.parse(savedUser);
+      }
+      return null;
     } catch {
-      return DEFAULT_DEMO_USER;
+      return null;
     }
   });
 
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('1fi_user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('1fi_user');
-    }
-  }, [user]);
+  const [authLoading, setAuthLoading] = useState(false);
 
-  async function login(usernameOrEmail, password) {
-    try {
-      const res = await loginUser({ usernameOrEmail, password });
-      setUser(res.user);
-      return { success: true, user: res.user };
-    } catch (err) {
-      // Local fallback for offline/client-only resilience
-      if (
-        (usernameOrEmail === 'nikhil' || usernameOrEmail === 'nikhil.jasti@example.com') &&
-        password === 'password123'
-      ) {
-        setUser(DEFAULT_DEMO_USER);
-        return { success: true, user: DEFAULT_DEMO_USER };
-      }
-      throw err;
-    }
-  }
-
-  function demoLogin() {
-    setUser(DEFAULT_DEMO_USER);
-    return DEFAULT_DEMO_USER;
-  }
-
-  function logout() {
+  const logout = useCallback(() => {
+    clearAuthToken();
+    localStorage.removeItem('1fi_user');
     setUser(null);
+  }, []);
+
+  // Listen for 401 session expiration from API client
+  useEffect(() => {
+    function handleExpired() {
+      logout();
+    }
+    window.addEventListener('1fi-auth-expired', handleExpired);
+    return () => window.removeEventListener('1fi-auth-expired', handleExpired);
+  }, [logout]);
+
+  // Validate active token with server on mount if token exists
+  useEffect(() => {
+    const token = getAuthToken();
+    if (token) {
+      getCurrentUser()
+        .then((userData) => {
+          if (userData) {
+            setUser(userData);
+            localStorage.setItem('1fi_user', JSON.stringify(userData));
+          }
+        })
+        .catch(() => {
+          // If token is invalid or server rejects, clear session
+          logout();
+        });
+    }
+  }, [logout]);
+
+  async function login(usernameOrEmail, password, rememberMe = true) {
+    setAuthLoading(true);
+    try {
+      const res = await loginUser({ usernameOrEmail, password }, rememberMe);
+      const safeUser = res.user;
+      setUser(safeUser);
+      localStorage.setItem('1fi_user', JSON.stringify(safeUser));
+      return { success: true, user: safeUser };
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  async function demoLogin() {
+    setAuthLoading(true);
+    try {
+      // Authenticates with backend and retrieves authentic signed HMAC bearer token
+      const res = await loginUser({ usernameOrEmail: 'nikhil', password: 'password123' }, true);
+      const safeUser = res.user;
+      setUser(safeUser);
+      localStorage.setItem('1fi_user', JSON.stringify(safeUser));
+      return safeUser;
+    } finally {
+      setAuthLoading(false);
+    }
   }
 
   async function requestPasswordReset(email) {
-    try {
-      return await forgotPasswordUser({ email });
-    } catch {
-      return {
-        success: true,
-        message: `Verification code sent to ${email} (Demo OTP: 849201)`,
-        demoOtp: '849201',
-      };
-    }
+    return await forgotPasswordUser({ email });
   }
 
   async function confirmPasswordReset(email, otp, newPassword) {
-    try {
-      return await resetPasswordUser({ email, otp, newPassword });
-    } catch {
-      return {
-        success: true,
-        message: 'Password reset successfully! You can now log in.',
-      };
-    }
+    return await resetPasswordUser({ email, otp, newPassword });
   }
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: Boolean(user),
+        isAuthenticated: Boolean(user && getAuthToken()),
+        authLoading,
         login,
         demoLogin,
         logout,

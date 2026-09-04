@@ -8,15 +8,50 @@ class ApiError extends Error {
   }
 }
 
+const TOKEN_KEY = '1fi_auth_token';
+
+export function getAuthToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY) || null;
+  } catch {
+    return null;
+  }
+}
+
+export function setAuthToken(token, remember = true) {
+  try {
+    if (remember) {
+      localStorage.setItem(TOKEN_KEY, token);
+    } else {
+      sessionStorage.setItem(TOKEN_KEY, token);
+    }
+  } catch {
+    // Ignore storage quota error
+  }
+}
+
+export function clearAuthToken() {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // Ignore storage quota error
+  }
+}
+
 async function request(path, options = {}) {
   let response;
+  const token = getAuthToken();
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(options.headers || {}),
+  };
+
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers || {}),
-      },
       ...options,
+      headers,
     });
   } catch {
     throw new ApiError(
@@ -33,13 +68,22 @@ async function request(path, options = {}) {
     throw new ApiError('Received an unexpected response from the server.', response.status, 'BAD_RESPONSE');
   }
 
+  if (response.status === 401) {
+    clearAuthToken();
+    try {
+      window.dispatchEvent(new CustomEvent('1fi-auth-expired'));
+    } catch {
+      // Ignore if not running in DOM
+    }
+  }
+
   if (!response.ok || body.success === false) {
     const message = body?.error?.message || 'Something went wrong.';
     const code = body?.error?.code || 'UNKNOWN_ERROR';
     throw new ApiError(message, response.status, code);
   }
 
-  return body.data;
+  return body.data !== undefined ? body.data : body;
 }
 
 export function getProducts(params = {}) {
@@ -85,11 +129,19 @@ export function prepayOrder(orderId) {
   });
 }
 
-export function loginUser(credentials) {
-  return request('/api/auth/login', {
+export async function loginUser(credentials, rememberMe = true) {
+  const data = await request('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify(credentials),
   });
+  if (data?.token) {
+    setAuthToken(data.token, rememberMe);
+  }
+  return data;
+}
+
+export function getCurrentUser() {
+  return request('/api/auth/me');
 }
 
 export function forgotPasswordUser(payload) {

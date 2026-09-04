@@ -1,5 +1,7 @@
 const crypto = require('crypto');
 const { validateEmail } = require('../middleware/validation');
+const { signToken } = require('../utils/tokenService');
+const { setGetUserById } = require('../middleware/authMiddleware');
 
 /**
  * Cryptographic Password Hashing Utilities (OWASP standard PBKDF2)
@@ -14,7 +16,10 @@ function verifyPassword(password, storedHash) {
   if (!storedHash || !storedHash.includes(':')) return false;
   const [salt, originalHash] = storedHash.split(':');
   const calculatedHash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
-  return crypto.timingSafeEqual(Buffer.from(calculatedHash, 'hex'), Buffer.from(originalHash, 'hex'));
+  const calcBuf = Buffer.from(calculatedHash, 'hex');
+  const origBuf = Buffer.from(originalHash, 'hex');
+  if (calcBuf.length !== origBuf.length) return false;
+  return crypto.timingSafeEqual(calcBuf, origBuf);
 }
 
 // Pre-seeded users with secure cryptographically salted & hashed passwords
@@ -45,13 +50,21 @@ const USERS = [
   },
 ];
 
+function getUserById(id) {
+  return USERS.find((u) => u.id === id) || null;
+}
+
+// Register user lookup in auth middleware
+setGetUserById(getUserById);
+
 // Active OTP store for forgot-password resets
+// Key: email -> { otp: string, expiresAt: number, attempts: number }
 const OTP_STORE = new Map();
 
 function login(req, res) {
   const { usernameOrEmail, password } = req.body || {};
 
-  if (!usernameOrEmail || !password) {
+  if (!usernameOrEmail || !password || typeof usernameOrEmail !== 'string' || typeof password !== 'string') {
     return res.status(400).json({
       success: false,
       error: { code: 'INVALID_CREDENTIALS', message: 'Username/email and password are required.' },
@@ -70,9 +83,17 @@ function login(req, res) {
     });
   }
 
-  // Trim API response: Strip passwordHash completely
+  // Strip passwordHash completely
   const { passwordHash, ...safeUser } = user;
-  const token = `1fi-jwt-${crypto.randomBytes(24).toString('hex')}`;
+
+  // Cryptographically signed HMAC-SHA256 bearer token
+  const token = signToken({
+    sub: user.id,
+    username: user.username,
+    email: user.email,
+    name: user.name,
+    kycStatus: user.kycStatus,
+  });
 
   res.json({
     success: true,
@@ -94,14 +115,31 @@ function forgotPassword(req, res) {
     });
   }
 
-  // Generate secure 6-digit OTP
-  const otp = '849201'; // Deterministic demo OTP for review, real TTL store
-  OTP_STORE.set(email.toLowerCase().trim(), { otp, expiresAt: Date.now() + 10 * 60 * 1000 });
+  const normalizedEmail = email.toLowerCase().trim();
+  const userExists = USERS.some((u) => u.email.toLowerCase() === normalizedEmail);
 
+  // Generate cryptographically unpredictable 6-digit OTP (NO static backdoors)
+  const otp = crypto.randomInt(100000, 1000000).toString();
+  const TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+  if (userExists) {
+    OTP_STORE.set(normalizedEmail, {
+      otp,
+      expiresAt: Date.now() + TTL_MS,
+      attempts: 0,
+    });
+
+    // eslint-disable-next-line no-console
+    console.log(`[AUTH-AUDIT] Secure OTP generated for ${normalizedEmail}. (Expires in 10m)`);
+  }
+
+  // Return standard secure response (Timing/User enumeration defense: identical message)
+  const isDev = process.env.NODE_ENV !== 'production';
   res.json({
     success: true,
-    message: `A 6-digit verification code has been dispatched to ${email}. (Demo OTP: ${otp})`,
-    demoOtp: otp,
+    message: `If that email address is registered, a 6-digit verification code has been dispatched.`,
+    // In dev environment only, provide devOtpHint to facilitate local testing without an SMTP server
+    ...(isDev && userExists ? { devOtpHint: otp } : {}),
   });
 }
 
@@ -115,41 +153,75 @@ function resetPassword(req, res) {
     });
   }
 
-  if (newPassword.length < 6) {
+  if (typeof newPassword !== 'string' || newPassword.length < 8) {
     return res.status(400).json({
       success: false,
-      error: { code: 'WEAK_PASSWORD', message: 'Password must be at least 6 characters in length.' },
+      error: { code: 'WEAK_PASSWORD', message: 'Password must be at least 8 characters in length for bank-grade security.' },
     });
   }
 
-  const record = OTP_STORE.get(email.toLowerCase().trim());
-  const storedOtp = record?.otp || '849201';
+  const normalizedEmail = email.toLowerCase().trim();
+  const record = OTP_STORE.get(normalizedEmail);
 
-  if (otp !== storedOtp && otp !== '849201') {
+  if (!record || Date.now() > record.expiresAt) {
+    OTP_STORE.delete(normalizedEmail);
     return res.status(400).json({
       success: false,
-      error: { code: 'INVALID_OTP', message: 'Invalid or expired verification code.' },
+      error: { code: 'INVALID_OR_EXPIRED_OTP', message: 'Verification code is invalid or has expired.' },
     });
   }
 
-  const user = USERS.find((u) => u.email.toLowerCase() === email.toLowerCase().trim());
+  // Max 5 attempts to thwart brute force
+  if (record.attempts >= 5) {
+    OTP_STORE.delete(normalizedEmail);
+    return res.status(429).json({
+      success: false,
+      error: { code: 'TOO_MANY_ATTEMPTS', message: 'Too many incorrect attempts. Please request a new verification code.' },
+    });
+  }
+
+  record.attempts += 1;
+
+  const enteredOtp = String(otp).trim();
+  const expectedOtp = String(record.otp);
+
+  let isMatch = false;
+  if (enteredOtp.length === expectedOtp.length) {
+    isMatch = crypto.timingSafeEqual(Buffer.from(enteredOtp), Buffer.from(expectedOtp));
+  }
+
+  if (!isMatch) {
+    return res.status(400).json({
+      success: false,
+      error: { code: 'INVALID_OTP', message: 'Invalid verification code.' },
+    });
+  }
+
+  // OTP verified successfully - invalidate OTP immediately
+  OTP_STORE.delete(normalizedEmail);
+
+  const user = USERS.find((u) => u.email.toLowerCase() === normalizedEmail);
   if (user) {
     user.passwordHash = hashPassword(newPassword);
   }
-  OTP_STORE.delete(email.toLowerCase().trim());
 
   res.json({
     success: true,
-    message: 'Your password has been successfully updated! You can now sign in.',
+    message: 'Your password has been successfully updated! You can now sign in with your new credentials.',
   });
 }
 
 function getCurrentUser(req, res) {
-  const user = USERS[0];
-  const { passwordHash, ...safeUser } = user;
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: { code: 'AUTH_REQUIRED', message: 'Authentication required.' },
+    });
+  }
+
   res.json({
     success: true,
-    data: safeUser,
+    data: req.user,
   });
 }
 
@@ -160,4 +232,7 @@ module.exports = {
   getCurrentUser,
   hashPassword,
   verifyPassword,
+  getUserById,
+  USERS,
+  OTP_STORE,
 };

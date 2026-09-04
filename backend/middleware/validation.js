@@ -1,31 +1,51 @@
 /**
- * Input Sanitization & Anti-Tampering Validation Middleware
+ * Input Sanitization, Anti-Tampering & Prototype Pollution Defense Middleware
  */
+
+const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
 function sanitizeString(str) {
   if (typeof str !== 'string') return str;
   return str
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // remove script tags
-    .replace(/[<>]/g, '') // strip raw angle brackets
+    .replace(/\0/g, '') // Strip null bytes
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
+    .replace(/[<>]/g, '') // Strip raw angle brackets
+    .replace(/javascript\s*:/gi, '') // Strip javascript: protocol
+    .replace(/vbscript\s*:/gi, '') // Strip vbscript: protocol
     .trim();
 }
 
 function sanitizeObject(obj) {
-  if (Array.isArray(obj)) {
-    return obj.map((item) => (typeof item === 'string' ? sanitizeString(item) : sanitizeObject(item)));
+  if (obj === null || typeof obj !== 'object') {
+    return typeof obj === 'string' ? sanitizeString(obj) : obj;
   }
 
-  const clean = {};
+  if (Array.isArray(obj)) {
+    return obj.map((item) => sanitizeObject(item));
+  }
+
+  const clean = Object.create(null); // Pure dictionary without prototype
+
   for (const [key, val] of Object.entries(obj)) {
+    // Block Prototype Pollution
+    if (FORBIDDEN_KEYS.has(key)) {
+      continue;
+    }
+
+    const cleanKey = sanitizeString(key);
+    if (!cleanKey) continue;
+
     if (typeof val === 'string') {
-      clean[key] = sanitizeString(val);
-    } else if (typeof val === 'object') {
-      clean[key] = sanitizeObject(val);
+      clean[cleanKey] = sanitizeString(val);
+    } else if (typeof val === 'object' && val !== null) {
+      clean[cleanKey] = sanitizeObject(val);
     } else {
-      clean[key] = val;
+      clean[cleanKey] = val;
     }
   }
-  return clean;
+
+  // Convert back to regular object safely
+  return Object.assign({}, clean);
 }
 
 function sanitizeInputMiddleware(req, res, next) {
@@ -44,13 +64,17 @@ function sanitizeInputMiddleware(req, res, next) {
     req.query = sanitizeObject(req.query);
   }
 
+  if (req.params && typeof req.params === 'object') {
+    req.params = sanitizeObject(req.params);
+  }
+
   next();
 }
 
 function validateEmail(email) {
   if (!email || typeof email !== 'string') return false;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email.trim());
+  return emailRegex.test(email.trim()) && email.length <= 254;
 }
 
 module.exports = {
@@ -58,4 +82,5 @@ module.exports = {
   sanitizeObject,
   sanitizeInputMiddleware,
   validateEmail,
+  FORBIDDEN_KEYS,
 };
