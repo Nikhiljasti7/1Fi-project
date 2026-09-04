@@ -5,6 +5,32 @@ export default {
   theme: {
     extend: {
       colors: {
+        // DJI Style Reference Tokens
+        onyx: '#000000',
+        paper: '#ffffff',
+        fog: '#ededed',
+        slate: {
+          DEFAULT: '#6c7073',
+          50: '#F8FAFC',
+          100: '#F1F5F9',
+          200: '#E2E8F0',
+          300: '#CBD5E1',
+          400: '#94A3B8',
+          500: '#6c7073',
+          600: '#595959',
+          700: '#303233',
+          800: '#272727',
+          900: '#141414',
+          950: '#000000',
+        },
+        graphite: '#595959',
+        iron: '#303233',
+        ash: '#8c8c8c',
+        carbon: '#272727',
+        signalBlue: '#0070d5',
+        indigoSteel: '#3b63a9',
+
+        // 1Fi Theme Accents
         surface: {
           50: '#F8FAFC',
           100: '#F1F5F9',
@@ -19,16 +45,16 @@ export default {
           950: '#020617',
         },
         brand: {
-          50: '#EEF2FF',
-          100: '#E0E7FF',
-          200: '#C7D2FE',
-          300: '#A5B4FC',
-          400: '#818CF8',
-          500: '#6366F1',
-          600: '#4F46E5',
-          700: '#4338CA',
-          800: '#3730A3',
-          900: '#312E81',
+          50: '#F0F7FF',
+          100: '#E0EFFF',
+          200: '#B8DCFE',
+          300: '#7CBDFA',
+          400: '#369AF5',
+          500: '#0070D5', // DJI Signal Blue
+          600: '#005FB8',
+          700: '#004C94',
+          800: '#003B73',
+          900: '#002B54',
         },
         emerald: {
           50: '#ECFDF5',
@@ -40,22 +66,21 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['"Outfit"', '"Inter"', 'sans-serif'],
+        sans: ['"Open Sans"', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Open Sans"', '"Outfit"', 'system-ui', 'sans-serif'],
+      },
+      letterSpacing: {
+        tighter: '-0.03em',
+        tight: '-0.02em',
+      },
+      borderRadius: {
+        pill: '64px',
+        card: '4px',
       },
       boxShadow: {
         subtle: '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
-        glass: '0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(226, 232, 240, 0.8)',
-        'glass-hover': '0 20px 40px -10px rgba(79, 70, 229, 0.1), 0 0 0 1px rgba(99, 102, 241, 0.3)',
-        card: '0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(226, 232, 240, 0.8)',
-        'card-hover': '0 16px 36px -6px rgba(15, 23, 42, 0.09), 0 0 0 1px rgba(99, 102, 241, 0.3)',
-        glow: '0 0 30px -5px rgba(99, 102, 241, 0.25)',
-      },
-      backgroundImage: {
-        'radial-light': 'radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.06), transparent 70%)',
-        'radial-wealth-light': 'radial-gradient(circle at 100% 50%, rgba(16, 185, 129, 0.06), transparent 60%)',
-        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
-        'glass-active': 'linear-gradient(135deg, rgba(238, 242, 255, 0.9) 0%, rgba(236, 253, 245, 0.8) 100%)',
+        djiNav: 'rgba(0, 0, 0, 0.1) 0px 8px 16px 0px',
+        djiOverlay: 'rgba(0, 0, 0, 0.1) 0px 16px 16px 0px',
       },
     },
   },

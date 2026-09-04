@@ -9,11 +9,11 @@ import {
   PackageCheck,
   Menu,
   X,
-  Sparkles,
   LogOut,
   User,
   ChevronDown,
   Search,
+  ChevronRight,
 } from 'lucide-react';
 
 import Logo from './Logo';
@@ -24,15 +24,16 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
+  const [showPromoBar, setShowPromoBar] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   const navLinks = [
-    { to: '/', label: 'Shop Flagships', icon: Smartphone },
-    { to: '/wealth-backed-emi', label: 'Wealth EMI Simulator', icon: TrendingUp, highlight: true },
+    { to: '/', label: 'Smartphones', icon: Smartphone },
+    { to: '/wealth-backed-emi', label: 'Wealth EMI Simulator', icon: TrendingUp },
     { to: '/portfolio', label: 'Portfolio Vault', icon: ShieldCheck },
-    { to: '/compare', label: 'Compare', icon: ArrowLeftRight },
+    { to: '/compare', label: 'Compare Specs', icon: ArrowLeftRight },
     { to: '/orders', label: 'My Loans & Orders', icon: PackageCheck },
   ];
 
@@ -43,250 +44,218 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl shadow-subtle transition-colors duration-200">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-        {/* Brand Logo */}
-        <Link to="/" className="flex items-center gap-3">
-          <Logo className="h-9 w-9" />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-display font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">
-                1Fi <span className="text-indigo-600 dark:text-indigo-400">Wealth</span>
+    <>
+      {/* Top Announcement Bar (DJI Minimal Style) */}
+      {showPromoBar && (
+        <aside aria-label="Announcement" className="bg-[#ededed] dark:bg-[#1a1a1a] text-[#303233] dark:text-[#ededed] text-xs py-2 px-4 border-b border-[#dedede] dark:border-[#272727] transition-colors">
+          <div className="mx-auto max-w-[1200px] flex items-center justify-between">
+            <div className="flex items-center gap-2 mx-auto text-center">
+              <span className="font-light">
+                Introducing iPhone 17 Lineup: 0% No-Cost EMI backed by SEBI Registered Depositories.
               </span>
-              <span className="rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">
-                LAMF Engine
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
-              Zero-Downpayment EMI Backed by Mutual Funds &amp; Stocks
-            </p>
-          </div>
-        </Link>
-
-        {/* Desktop Live Search Bar */}
-        <div className="hidden md:block w-44 lg:w-60 xl:w-72 mx-2">
-          <SearchBar isCompact placeholder="Search iPhone 17, Pro, 0% EMI..." />
-        </div>
-
-        {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1">
-          {navLinks.map((link) => {
-            const Icon = link.icon;
-            const isActive = location.pathname === link.to;
-            return (
               <Link
-                key={link.to}
-                to={link.to}
-                className={[
-                  'flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition duration-200 whitespace-nowrap',
-                  isActive
-                    ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/60',
-                  link.highlight && !isActive ? 'text-emerald-700 dark:text-emerald-400' : '',
-                ].join(' ')}
+                to="/wealth-backed-emi"
+                className="text-[#0070d5] hover:underline font-medium inline-flex items-center gap-0.5"
               >
-                <Icon className={`h-4 w-4 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : link.highlight ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`} />
-                <span>{link.label}</span>
-                {link.highlight && (
-                  <Sparkles className="h-3 w-3 text-emerald-500 animate-pulse" />
-                )}
+                <span>Calculate EMI</span>
+                <ChevronRight className="h-3 w-3" />
               </Link>
-            );
-          })}
-        </nav>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowPromoBar(false)}
+              className="text-[#6c7073] hover:text-[#000000] dark:hover:text-white p-0.5"
+              aria-label="Dismiss announcement"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </aside>
+      )}
 
-        {/* User Auth, Limit & Theme Controls */}
-        <div className="hidden sm:flex items-center gap-2">
-          {/* Light / Dark Mode Toggle */}
-          <ThemeToggle />
-
-          <Link
-            to="/portfolio"
-            className="flex items-center gap-2 rounded-xl border border-emerald-200/80 dark:border-emerald-800/80 bg-emerald-50/70 dark:bg-emerald-950/40 px-2.5 py-1.5 transition hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 shrink-0"
-          >
-            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <div className="text-left">
-              <span className="block text-[9px] uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">
-                Limit
+      {/* Sticky Navigation Bar */}
+      <header className="sticky top-0 z-50 bg-[#ffffff] dark:bg-[#000000] border-b border-[#ededed] dark:border-[#272727] shadow-[rgba(0,0,0,0.06)_0px_8px_16px_0px] transition-colors duration-150">
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-3.5 sm:px-6">
+          {/* Brand Logo (DJI Clean Wordmark Style) */}
+          <Link to="/" className="flex items-center gap-3 shrink-0">
+            <Logo className="h-8 w-8" />
+            <div className="flex items-center gap-2">
+              <span className="font-display font-semibold text-lg text-[#000000] dark:text-[#ffffff] tracking-tight">
+                1Fi <span className="text-[#0070d5]">Wealth</span>
               </span>
-              <span className="block text-xs font-extrabold text-slate-900 dark:text-white">
-                ₹3.4L
+              <span className="rounded-full bg-[#ededed] dark:bg-[#272727] px-2 py-0.5 text-[10px] font-medium text-[#6c7073] dark:text-[#8c8c8c] uppercase tracking-wider">
+                LAMF
               </span>
             </div>
           </Link>
 
-          {/* User Profile / Login Button */}
-          {user ? (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setUserDropdown(!userDropdown)}
-                className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 py-1.5 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 transition"
-              >
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="h-7 w-7 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
-                />
-                <div className="text-left hidden xl:block">
-                  <span className="block text-xs font-bold text-slate-900 dark:text-white">{user.name}</span>
-                  <span className="block text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">KYC Verified</span>
-                </div>
-                <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
-              </button>
-
-              {/* Dropdown Menu */}
-              {userDropdown && (
-                <div className="absolute right-0 mt-2 w-52 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl backdrop-blur-2xl z-50 text-xs animate-in fade-in slide-in-from-top-2">
-                  <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
-                    <span className="font-bold text-slate-900 dark:text-white block">{user.name}</span>
-                    <span className="text-slate-400 text-[11px] truncate block">{user.email}</span>
-                  </div>
-                  <div className="py-1">
-                    <Link
-                      to="/portfolio"
-                      onClick={() => setUserDropdown(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
-                    >
-                      <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                      <span>My Portfolio Vault</span>
-                    </Link>
-                    <Link
-                      to="/orders"
-                      onClick={() => setUserDropdown(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
-                    >
-                      <PackageCheck className="h-4 w-4 text-indigo-600" />
-                      <span>Active Device Loans</span>
-                    </Link>
-                  </div>
-                  <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-medium"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Link
-              to="/login"
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-3.5 py-2 text-xs font-bold text-white shadow-md shadow-indigo-600/20 hover:from-indigo-700 hover:to-indigo-800 transition shrink-0"
-            >
-              <User className="h-3.5 w-3.5" />
-              <span>Sign In</span>
-            </Link>
-          )}
-        </div>
-
-        {/* Mobile Action Buttons (Theme + Search + Menu Toggle) */}
-        <div className="flex items-center gap-1.5 lg:hidden">
-          <ThemeToggle className="p-2" />
-          <button
-            type="button"
-            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-            className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-2 text-slate-700 dark:text-slate-200 hover:text-slate-900 shadow-sm"
-            aria-label="Search smartphones"
-          >
-            <Search className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-2 text-slate-700 dark:text-slate-200 hover:text-slate-900 shadow-sm"
-            aria-label="Toggle Navigation"
-          >
-            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Inline Search Bar Drawer */}
-      {mobileSearchOpen && (
-        <div className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 shadow-md animate-in fade-in slide-in-from-top-1">
-          <SearchBar
-            placeholder="Search iPhone 17, Galaxy, 0% EMI..."
-            onSearchSubmit={() => setMobileSearchOpen(false)}
-          />
-        </div>
-      )}
-
-      {/* Mobile Drawer */}
-      {mobileOpen && (
-        <div className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 px-4 py-4 backdrop-blur-2xl shadow-xl">
-          {/* Mobile search bar option */}
-          <div className="mb-4">
-            <SearchBar
-              placeholder="Search iPhone 17, Pro, 0% EMI..."
-              onSearchSubmit={() => setMobileOpen(false)}
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
+          {/* Center: Desktop Navigation Links (Open Sans 14px / 500, 24px gap) */}
+          <nav className="hidden lg:flex items-center gap-6">
             {navLinks.map((link) => {
-              const Icon = link.icon;
               const isActive = location.pathname === link.to;
               return (
                 <Link
                   key={link.to}
                   to={link.to}
-                  onClick={() => setMobileOpen(false)}
                   className={[
-                    'flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition',
+                    'text-sm transition duration-150 py-1 relative',
                     isActive
-                      ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80',
+                      ? 'text-[#0070d5] font-semibold'
+                      : 'text-[#303233] dark:text-[#ededed] font-medium hover:text-[#0070d5] dark:hover:text-[#0070d5]',
                   ].join(' ')}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                    <span>{link.label}</span>
-                  </div>
-                  {link.highlight && (
-                    <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
-                      Popular
-                    </span>
+                  <span>{link.label}</span>
+                  {isActive && (
+                    <span className="absolute -bottom-1 left-0 w-full h-[2px] bg-[#0070d5] rounded-full" />
                   )}
                 </Link>
               );
             })}
-          </div>
+          </nav>
 
-          <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          {/* Right Controls: Search, Theme Toggle, Portfolio Limit & Primary CTA */}
+          <div className="flex items-center gap-3">
+            {/* Desktop Live Search Bar */}
+            <div className="hidden md:block w-44 lg:w-56">
+              <SearchBar isCompact placeholder="Search iPhone 17, Pro..." />
+            </div>
+
+            {/* Light / Dark Mode Toggle */}
+            <ThemeToggle />
+
+            {/* User Profile or Persistent Signal Blue CTA */}
             {user ? (
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-2">
-                  <img src={user.avatar} alt={user.name} className="h-8 w-8 rounded-lg object-cover border border-slate-200 dark:border-slate-700" />
-                  <div>
-                    <span className="text-xs font-bold text-slate-900 dark:text-white block">{user.name}</span>
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">₹3.4L Limit</span>
-                  </div>
-                </div>
+              <div className="relative hidden sm:block">
                 <button
                   type="button"
-                  onClick={handleLogout}
-                  className="rounded-lg border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 px-2.5 py-1 text-xs font-bold text-rose-600 dark:text-rose-400"
+                  onClick={() => setUserDropdown(!userDropdown)}
+                  className="flex items-center gap-2 rounded-[4px] border border-[#ededed] dark:border-[#272727] bg-[#ffffff] dark:bg-[#141414] px-3 py-1.5 hover:border-[#6c7073] transition"
                 >
-                  Sign Out
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="h-6 w-6 rounded-full object-cover border border-[#ededed] dark:border-[#272727]"
+                  />
+                  <span className="text-xs font-medium text-[#303233] dark:text-white hidden xl:inline">
+                    {user.name}
+                  </span>
+                  <ChevronDown className="h-3.5 w-3.5 text-[#6c7073]" />
                 </button>
+
+                {/* Dropdown Menu */}
+                {userDropdown && (
+                  <div className="absolute right-0 mt-2 w-52 rounded-[4px] border border-[#ededed] dark:border-[#272727] bg-[#ffffff] dark:bg-[#141414] p-2 shadow-lg z-50 text-xs animate-in fade-in">
+                    <div className="px-3 py-2 border-b border-[#ededed] dark:border-[#272727]">
+                      <span className="font-semibold text-[#000000] dark:text-white block">{user.name}</span>
+                      <span className="text-[#6c7073] text-[11px] truncate block">{user.email}</span>
+                    </div>
+                    <div className="py-1">
+                      <Link
+                        to="/portfolio"
+                        onClick={() => setUserDropdown(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 text-[#303233] dark:text-[#ededed] hover:bg-[#ededed] dark:hover:bg-[#272727] hover:text-[#0070d5]"
+                      >
+                        <ShieldCheck className="h-4 w-4 text-[#0070d5]" />
+                        <span>My Portfolio Vault</span>
+                      </Link>
+                      <Link
+                        to="/orders"
+                        onClick={() => setUserDropdown(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 text-[#303233] dark:text-[#ededed] hover:bg-[#ededed] dark:hover:bg-[#272727] hover:text-[#0070d5]"
+                      >
+                        <PackageCheck className="h-4 w-4 text-[#0070d5]" />
+                        <span>Active Device Loans</span>
+                      </Link>
+                    </div>
+                    <div className="pt-1 border-t border-[#ededed] dark:border-[#272727]">
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <Link
                 to="/login"
-                onClick={() => setMobileOpen(false)}
-                className="w-full text-center rounded-xl bg-indigo-600 py-2.5 text-xs font-bold text-white shadow-md"
+                className="hidden sm:inline-flex items-center justify-center bg-[#0070d5] text-white rounded-[64px] px-5 py-2 text-sm font-medium hover:bg-[#005fb8] transition"
               >
-                Sign In / Register
+                Sign In
               </Link>
             )}
+
+            {/* Mobile Actions */}
+            <div className="flex items-center gap-1.5 lg:hidden">
+              <button
+                type="button"
+                onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                className="p-2 text-[#303233] dark:text-white rounded-[4px]"
+                aria-label="Search"
+              >
+                <Search className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="p-2 text-[#303233] dark:text-white rounded-[4px]"
+                aria-label="Menu"
+              >
+                {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            </div>
           </div>
         </div>
-      )}
-    </header>
+
+        {/* Mobile Search Bar Drawer */}
+        {mobileSearchOpen && (
+          <div className="lg:hidden border-t border-[#ededed] dark:border-[#272727] bg-[#ffffff] dark:bg-[#141414] px-4 py-3">
+            <SearchBar
+              placeholder="Search iPhone 17, Galaxy..."
+              onSearchSubmit={() => setMobileSearchOpen(false)}
+            />
+          </div>
+        )}
+
+        {/* Mobile Nav Drawer */}
+        {mobileOpen && (
+          <div className="lg:hidden border-t border-[#ededed] dark:border-[#272727] bg-[#ffffff] dark:bg-[#141414] px-4 py-4 space-y-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setMobileOpen(false)}
+                className="block py-2 text-sm font-medium text-[#303233] dark:text-[#ededed] hover:text-[#0070d5]"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <div className="pt-3 border-t border-[#ededed] dark:border-[#272727]">
+              {user ? (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full text-left py-2 text-sm font-medium text-rose-600"
+                >
+                  Sign Out ({user.name})
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full inline-flex items-center justify-center bg-[#0070d5] text-white rounded-[64px] py-2.5 text-sm font-medium"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+      </header>
+    </>
   );
 }

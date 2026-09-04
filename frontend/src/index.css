@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,153 +6,192 @@
 
 :root {
   color-scheme: light;
+  /* DJI Style Reference Tokens */
+  --color-onyx: #000000;
+  --color-paper: #ffffff;
+  --color-fog: #ededed;
+  --color-slate: #6c7073;
+  --color-graphite: #595959;
+  --color-iron: #303233;
+  --color-ash: #8c8c8c;
+  --color-carbon: #272727;
+  --color-signal-blue: #0070d5;
+  --color-indigo-steel: #3b63a9;
+
+  --font-open-sans: 'Open Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --radius-buttons: 64px;
+  --radius-cards: 4px;
+  --radius-inputs: 4px;
 }
 
 html.dark {
   color-scheme: dark;
-  background-color: #0B0F19;
-  color: #F8FAFC;
+  background-color: #000000;
+  color: #ffffff;
 }
 
 html {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Open Sans', 'Inter', system-ui, -apple-system, sans-serif;
   scroll-behavior: smooth;
-  background-color: #F8FAFC;
-  color: #0F172A;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  background-color: #ededed;
+  color: #000000;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #F8FAFC;
-  color: #0F172A;
+  background-color: #ededed;
+  color: #000000;
   overflow-x: hidden;
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 html.dark body {
-  background-color: #0B0F19;
-  color: #F8FAFC;
+  background-color: #000000;
+  color: #ffffff;
 }
 
-/* Light Luxury Glassmorphism Utilities */
+/* DJI Signature Component Utilities */
+.btn-dji-primary {
+  background-color: #0070d5;
+  color: #ffffff;
+  border-radius: 64px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-dji-primary:hover {
+  background-color: #005fb8;
+}
+
+.btn-dji-ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  color: #ffffff;
+  border-radius: 64px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 400;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-dji-ghost:hover {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.btn-dji-ghost-dark {
+  background: transparent;
+  border: 1px solid #303233;
+  color: #303233;
+  border-radius: 64px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 400;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-dji-ghost-dark:hover {
+  background-color: #303233;
+  color: #ffffff;
+}
+
+/* DJI Flat Clean Card Surface */
+.dji-card {
+  background-color: #ffffff;
+  border-radius: 4px;
+  padding: 24px;
+  border: none;
+  box-shadow: none;
+  transition: transform 0.15s ease;
+}
+
+html.dark .dji-card {
+  background-color: #141414;
+  color: #ffffff;
+}
+
+/* DJI Input Style */
+.dji-input {
+  background-color: #ffffff;
+  border: 1px solid #6c7073;
+  border-radius: 4px;
+  padding: 10px 16px;
+  color: #303233;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.dji-input:focus {
+  border-color: #0070d5;
+}
+
+html.dark .dji-input {
+  background-color: #1a1a1a;
+  border-color: #404040;
+  color: #ffffff;
+}
+
+html.dark .dji-input:focus {
+  border-color: #0070d5;
+}
+
+/* Glassmorphism utilities compatibility */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid #ededed;
 }
 
-.glass-panel-hover {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.glass-panel-hover:hover {
-  background: rgba(255, 255, 255, 0.98);
-  border-color: rgba(99, 102, 241, 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
-}
-
-.glass-pill {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-}
-
-.glass-pill-active {
-  background: linear-gradient(135deg, rgba(238, 242, 255, 0.95) 0%, rgba(236, 253, 245, 0.8) 100%);
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 4px 14px -2px rgba(99, 102, 241, 0.15);
+html.dark .glass-panel {
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid #272727;
 }
 
 .glass-input {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(203, 213, 225, 0.9);
-  color: #0F172A;
-}
-
-.glass-input:focus {
-  outline: none;
-  background: #FFFFFF;
-  border-color: rgba(99, 102, 241, 0.6);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-}
-
-/* Dark Luxury Glassmorphism Utilities */
-html.dark .glass-panel {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(51, 65, 85, 0.7);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-}
-
-html.dark .glass-panel-hover:hover {
-  background: rgba(30, 41, 59, 0.95);
-  border-color: rgba(129, 140, 248, 0.5);
-  box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.3);
-}
-
-html.dark .glass-pill {
-  background: rgba(30, 41, 59, 0.75);
-  border-color: rgba(51, 65, 85, 0.8);
-  color: #E2E8F0;
+  background: #ffffff;
+  border: 1px solid #6c7073;
+  border-radius: 4px;
+  color: #000000;
 }
 
 html.dark .glass-input {
-  background: rgba(15, 23, 42, 0.85);
-  border-color: rgba(51, 65, 85, 0.8);
-  color: #F8FAFC;
+  background: #141414;
+  border: 1px solid #404040;
+  color: #ffffff;
 }
 
-html.dark .glass-input:focus {
-  background: rgba(15, 23, 42, 0.98);
-  border-color: rgba(129, 140, 248, 0.7);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-}
-
-/* Custom scrollbars */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #ededed;
 }
-
 html.dark ::-webkit-scrollbar-track {
-  background: #0B0F19;
+  background: #141414;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 4px;
+  background: #8c8c8c;
+  border-radius: 3px;
 }
-
-html.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
-}
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
-}
-
-html.dark ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
-}
-
-@layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+  background: #6c7073;
 }
