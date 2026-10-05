@@ -81,7 +81,9 @@ export default function LoginPage() {
   });
 
   const activeGoogleClientId =
-    import.meta.env.VITE_GOOGLE_CLIENT_ID || manualClientId.trim() || '';
+    import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+    manualClientId.trim() ||
+    '662901816761-f7pbodlkn54etl9c6nbsmu8il80fgbqo.apps.googleusercontent.com';
 
   // Initialize Google Identity Services (GIS) button and listener when client ID is available
   useEffect(() => {

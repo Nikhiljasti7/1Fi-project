@@ -256,7 +256,9 @@ async function googleLogin(req, res) {
       const payload = await googleRes.json();
 
       // Check configured Google Client ID audience if defined
-      const expectedAudience = process.env.GOOGLE_CLIENT_ID;
+      const expectedAudience =
+        process.env.GOOGLE_CLIENT_ID ||
+        '662901816761-f7pbodlkn54etl9c6nbsmu8il80fgbqo.apps.googleusercontent.com';
       if (expectedAudience && payload.aud !== expectedAudience) {
         return res.status(401).json({
           success: false,
