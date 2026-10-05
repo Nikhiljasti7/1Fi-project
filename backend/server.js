@@ -49,6 +49,7 @@ app.get('/', (req, res) => {
       orders: '/api/orders',
       auth: {
         login: 'POST /api/auth/login',
+        google: 'POST /api/auth/google',
         me: 'GET /api/auth/me',
         forgotPassword: 'POST /api/auth/forgot-password',
         resetPassword: 'POST /api/auth/reset-password',

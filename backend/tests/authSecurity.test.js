@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { hashPassword, verifyPassword } = require('../controllers/authController');
+const { hashPassword, verifyPassword, googleLogin } = require('../controllers/authController');
 const { sanitizeString, sanitizeObject } = require('../middleware/validation');
 const { signToken, verifyToken } = require('../utils/tokenService');
 
@@ -68,4 +68,61 @@ test('verifyToken rejects tampered or expired tokens', () => {
   const validToken = signToken(payload, 60 * 1000);
   const tamperedToken = validToken.slice(0, -4) + 'abcd';
   assert.throws(() => verifyToken(tamperedToken), /INVALID_SIGNATURE/);
+});
+
+test('googleLogin rejects request when credentials are missing', async () => {
+  const req = { body: {} };
+  let statusCode = 200;
+  let responseBody = null;
+  const res = {
+    status(code) {
+      statusCode = code;
+      return this;
+    },
+    json(data) {
+      responseBody = data;
+      return this;
+    },
+  };
+  await googleLogin(req, res);
+  assert.equal(statusCode, 400);
+  assert.equal(responseBody.success, false);
+  assert.equal(responseBody.error.code, 'MISSING_GOOGLE_CREDENTIAL');
+});
+
+test('googleLogin registers and authenticates new Google user successfully', async () => {
+  const req = {
+    body: {
+      demoGoogleUser: {
+        email: 'test.google.user@example.com',
+        name: 'Test Google Investor',
+        picture: 'https://example.com/avatar.jpg',
+        sub: 'google-sub-999',
+      },
+    },
+  };
+  let statusCode = 200;
+  let responseBody = null;
+  const res = {
+    status(code) {
+      statusCode = code;
+      return this;
+    },
+    json(data) {
+      responseBody = data;
+      return this;
+    },
+  };
+  await googleLogin(req, res);
+  assert.equal(statusCode, 200);
+  assert.equal(responseBody.success, true);
+  assert.equal(responseBody.data.user.email, 'test.google.user@example.com');
+  assert.equal(responseBody.data.user.name, 'Test Google Investor');
+  assert.equal(responseBody.data.user.authProvider, 'google');
+  assert.ok(responseBody.data.token);
+
+  // Validate that the signed token decodes accurately
+  const decoded = verifyToken(responseBody.data.token);
+  assert.equal(decoded.email, 'test.google.user@example.com');
+  assert.equal(decoded.authProvider, 'google');
 });

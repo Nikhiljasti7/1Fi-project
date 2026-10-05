@@ -41,7 +41,9 @@ function requireAuth(req, res, next) {
         username: decoded.username,
         email: decoded.email,
         name: decoded.name || decoded.username,
+        avatar: decoded.avatar,
         kycStatus: decoded.kycStatus || 'VERIFIED',
+        authProvider: decoded.authProvider || 'local',
       };
     } else {
       const { passwordHash, ...safeUser } = user;
@@ -82,7 +84,9 @@ function optionalAuth(req, res, next) {
         username: decoded.username,
         email: decoded.email,
         name: decoded.name || decoded.username,
+        avatar: decoded.avatar,
         kycStatus: decoded.kycStatus || 'VERIFIED',
+        authProvider: decoded.authProvider || 'local',
       };
     }
   } catch {

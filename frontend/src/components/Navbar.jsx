@@ -146,7 +146,14 @@ export default function Navbar() {
                 {userDropdown && (
                   <div className="absolute right-0 mt-2 w-52 rounded-[4px] border border-[#ededed] dark:border-[#272727] bg-[#ffffff] dark:bg-[#141414] p-2 shadow-lg z-50 text-xs animate-in fade-in">
                     <div className="px-3 py-2 border-b border-[#ededed] dark:border-[#272727]">
-                      <span className="font-semibold text-[#000000] dark:text-white block">{user.name}</span>
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="font-semibold text-[#000000] dark:text-white block truncate">{user.name}</span>
+                        {user.authProvider === 'google' && (
+                          <span className="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded-full font-semibold shrink-0">
+                            Google
+                          </span>
+                        )}
+                      </div>
                       <span className="text-[#6c7073] text-[11px] truncate block">{user.email}</span>
                     </div>
                     <div className="py-1">

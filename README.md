@@ -377,7 +377,41 @@ Authenticates investor credentials and returns an HMAC-SHA256 Bearer token.
 
 ---
 
-### 6. `POST /api/orders` *(Protected)*
+### 6. `POST /api/auth/google`
+Direct Google Account Authentication. Accepts Google Identity Services ID token (`credential`) or Google OAuth 2.0 `accessToken`, verifies the cryptographic signature with Google (`oauth2.googleapis.com`), creates or links the investor profile, and returns an HMAC-SHA256 signed Bearer token.
+
+* **Request Body**:
+  ```json
+  {
+    "credential": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ij...",
+    "accessToken": "ya29.a0AWY7Ckm..."
+  }
+  ```
+
+* **Response (`200 OK`)**:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9....",
+      "user": {
+        "id": "google-10982348712903847",
+        "username": "nikhil_jasti",
+        "email": "nikhil.jasti@gmail.com",
+        "name": "Nikhil Jasti",
+        "avatar": "https://lh3.googleusercontent.com/...",
+        "panMasked": "•••••4819K",
+        "kycStatus": "VERIFIED",
+        "authProvider": "google"
+      }
+    },
+    "message": "Signed in securely with Google."
+  }
+  ```
+
+---
+
+### 7. `POST /api/orders` *(Protected)*
 Places a wealth-backed order with server-side price anti-tampering validation.
 
 * **Headers**: `Authorization: Bearer <token>`
@@ -452,4 +486,23 @@ Deploy both frontend and backend to Vercel's free Hobby tier as **two separate p
 3. **Framework Preset**: *Vite* (auto-detected).
 4. Under **Environment Variables**, add:
    - `VITE_API_BASE_URL` = `https://<your-backend>.vercel.app`
+   - `VITE_GOOGLE_CLIENT_ID` = `your-google-client-id.apps.googleusercontent.com`
 5. Click **Deploy**.
+
+### 3. Configure Google OAuth 2.0 (Google Account Direct Authentication)
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
+2. Create or select a project and configure the **OAuth consent screen** (User type: *External*, App name: `1Fi Wealth`).
+3. Click **Create Credentials** > **OAuth client ID** > **Web application**.
+4. In **Authorized JavaScript origins**, add:
+   - `https://1-fi-project-frontend.vercel.app`
+   - `http://localhost:5173`
+5. In **Authorized redirect URIs**, add:
+   - `https://1-fi-project-frontend.vercel.app/login`
+   - `https://1-fi-project-frontend.vercel.app`
+   - `http://localhost:5173/login`
+   - `http://localhost:5173`
+6. Copy the **Client ID** and set:
+   - In **Vercel Frontend Settings** > **Environment Variables**: `VITE_GOOGLE_CLIENT_ID`
+   - In **Vercel Backend Settings** > **Environment Variables**: `GOOGLE_CLIENT_ID`
+   - In local `frontend/.env`: `VITE_GOOGLE_CLIENT_ID`
+   - In local `backend/.env`: `GOOGLE_CLIENT_ID`

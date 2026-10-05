@@ -140,6 +140,17 @@ export async function loginUser(credentials, rememberMe = true) {
   return data;
 }
 
+export async function loginWithGoogleApi(payload, rememberMe = true) {
+  const data = await request('/api/auth/google', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  if (data?.token) {
+    setAuthToken(data.token, rememberMe);
+  }
+  return data;
+}
+
 export function getCurrentUser() {
   return request('/api/auth/me');
 }

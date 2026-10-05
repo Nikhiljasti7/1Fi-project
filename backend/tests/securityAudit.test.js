@@ -155,4 +155,45 @@ describe('Security Penetration & Hardening Audit', () => {
     assert.ok(res.headers.get('strict-transport-security'), 'HSTS must be set');
     assert.equal(res.headers.get('x-powered-by'), null, 'X-Powered-By must be removed');
   });
+
+  it('GOOGLE AUTH: POST /api/auth/google validates credentials and generates authentic session', async () => {
+    // Missing credentials
+    const emptyRes = await fetch(`${baseUrl}/api/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    assert.equal(emptyRes.status, 400);
+    const emptyBody = await emptyRes.json();
+    assert.equal(emptyBody.error.code, 'MISSING_GOOGLE_CREDENTIAL');
+
+    // Valid Google authenticated profile sync
+    const authRes = await fetch(`${baseUrl}/api/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        demoGoogleUser: {
+          email: 'audit.google@example.com',
+          name: 'Audit Google User',
+          sub: 'audit-sub-456',
+        },
+      }),
+    });
+    assert.equal(authRes.status, 200);
+    const authBody = await authRes.json();
+    assert.equal(authBody.success, true);
+    assert.equal(authBody.data.user.email, 'audit.google@example.com');
+    assert.equal(authBody.data.user.authProvider, 'google');
+    assert.ok(authBody.data.token);
+
+    // Verify token works on /api/auth/me
+    const meRes = await fetch(`${baseUrl}/api/auth/me`, {
+      headers: {
+        Authorization: `Bearer ${authBody.data.token}`,
+      },
+    });
+    assert.equal(meRes.status, 200);
+    const meBody = await meRes.json();
+    assert.equal(meBody.data.email, 'audit.google@example.com');
+  });
 });

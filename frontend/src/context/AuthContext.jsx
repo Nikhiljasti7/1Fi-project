@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   loginUser,
+  loginWithGoogleApi,
   forgotPasswordUser,
   resetPasswordUser,
   getCurrentUser,
@@ -72,6 +73,22 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function loginWithGoogle(credentialOrPayload, rememberMe = true) {
+    setAuthLoading(true);
+    try {
+      const payload = typeof credentialOrPayload === 'string'
+        ? { credential: credentialOrPayload }
+        : credentialOrPayload;
+      const res = await loginWithGoogleApi(payload, rememberMe);
+      const safeUser = res.user;
+      setUser(safeUser);
+      localStorage.setItem('1fi_user', JSON.stringify(safeUser));
+      return { success: true, user: safeUser };
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
   async function demoLogin() {
     setAuthLoading(true);
     try {
@@ -101,6 +118,7 @@ export function AuthProvider({ children }) {
         isAuthenticated: Boolean(user && getAuthToken()),
         authLoading,
         login,
+        loginWithGoogle,
         demoLogin,
         logout,
         requestPasswordReset,
